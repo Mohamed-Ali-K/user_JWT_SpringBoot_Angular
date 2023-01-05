@@ -1,0 +1,24 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    container_name: supportportal
+    image: postgres
+    environment:
+      POSTGRES_USER : ${db_username}
+      POSTGRES_PASSWORD: ${db_password}
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5332:5432"
+    networks:
+      - db
+    restart : unless-stopped
+networks:
+  db:
+    driver: bridge
+volumes:
+  db:
