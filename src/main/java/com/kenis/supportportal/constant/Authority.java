@@ -9,9 +9,14 @@ package com.kenis.supportportal.constant;
  * Similarly, the other roles have their respective authorities.
  */
 public class Authority {
+    /** The authority to read user data */
     public static final String[] USER_AUTHORITIES = {"user:read"};
+    /** The authority to read and update user data */
     public static final String[] HR_AUTHORITIES = {"user:read", "user:update" };
+    /** The authority to read and update user data */
     public static final String[] MANAGER_AUTHORITIES = {"user:read", "user:update"};
+    /** The authority to read, update, and create user data */
     public static final String[] ADMIN_AUTHORITIES = {"user:read", "user:update", "user:create"};
+    /** The authority to read, update, create, and delete user data */
     public static final String[] SUPER_ADMIN_AUTHORITIES = {"user:read", "user:update", "user:create", "user:delete"};
 }
