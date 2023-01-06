@@ -1,5 +1,6 @@
 package com.kenis.supportportal.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 
@@ -16,6 +17,7 @@ public class HttpResponse {
     private HttpStatus httpStatus ;
     private String reason ;
     private String message;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss", timezone = "CET")
     private Date timeStamp;
 
     public HttpResponse(Integer httpStatusCode, HttpStatus httpStatus, String reason, String message) {
