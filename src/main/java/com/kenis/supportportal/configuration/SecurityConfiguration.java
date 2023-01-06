@@ -12,7 +12,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,12 +24,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private JwtAuthorizationFilter jwtAuthorizationFilter;
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private UserDetailsService userDetailsService;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final UserDetailsService userDetailsService;
 
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     public SecurityConfiguration (JwtAuthorizationFilter jwtAuthorizationFilter,
