@@ -2,11 +2,12 @@ package com.kenis.supportportal.repository;
 
 import com.kenis.supportportal.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-@Repository
+
+@Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByUserName(String username);
-    User findUserByUserEmail(String username);
+    User findUserByEmail(String email);
 }
