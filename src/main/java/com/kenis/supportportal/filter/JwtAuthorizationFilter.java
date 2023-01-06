@@ -1,9 +1,7 @@
 package com.kenis.supportportal.filter;
 
-import com.kenis.supportportal.constant.SecurityConstant;
+
 import com.kenis.supportportal.utility.JWTTokenProvider;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +22,7 @@ import static org.springframework.http.HttpStatus.*;
 
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
-    private JWTTokenProvider jwtTokenProvider;
+    private final JWTTokenProvider jwtTokenProvider;
 
     public JwtAuthorizationFilter(JWTTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
@@ -52,6 +50,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.clearContext();
             }
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }
