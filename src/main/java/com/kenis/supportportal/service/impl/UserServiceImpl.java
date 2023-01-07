@@ -2,7 +2,6 @@ package com.kenis.supportportal.service.impl;
 
 import com.kenis.supportportal.domain.User;
 import com.kenis.supportportal.domain.UserPrincipal;
-import com.kenis.supportportal.enumeration.Role;
 import com.kenis.supportportal.exception.domain.EmailExistException;
 import com.kenis.supportportal.exception.domain.UserNameExistException;
 import com.kenis.supportportal.exception.domain.UserNotFoundException;
@@ -23,9 +22,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
+
+import static com.kenis.supportportal.constant.UserImpConstant.*;
 import static com.kenis.supportportal.enumeration.Role.*;
+
 /**
  * Implementation of the {@link UserService} and {@link UserDetailsService} interfaces.
  *
@@ -40,8 +41,9 @@ import static com.kenis.supportportal.enumeration.Role.*;
 @Transactional
 @Qualifier("UserDetailsService")
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private UserRepository userRepository;
-    private BCryptPasswordEncoder passwordEncoder;
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
@@ -69,29 +71,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUserName(username);
         if (user == null) {
-            log.error("User not found by Username : " + username);
-            throw new UsernameNotFoundException("User not found by Username : " + username);
+            log.error(NO_USER_FOUND_BY_USERNAME + username);
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME  + username);
         } else {
             user.setLastLoginDate(user.getLastLoginDate());
             user.setLastLoginDate(new Date());
             userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
-            log.info("returning found user by username: " + username);
+            log.info(RETURNING_FOUND_USER_BY_USERNAME + username);
             return userPrincipal;
         }
 
     }
+
     /**
      * Registers a new user with the given information.
      * This method checks that the given username and email address are not already in use,
      * and throws an exception if they are.
+     *
      * @param firstName the first name of the user
-     * @param lastName the last name of the user
-     * @param userName the user name of the user
-     * @param email the email address of the user
+     * @param lastName  the last name of the user
+     * @param userName  the user name of the user
+     * @param email     the email address of the user
      * @return the registered user
-     * @throws UserNotFoundException if the user does not exist
-     * @throws EmailExistException if the email address is already in use
+     * @throws UserNotFoundException  if the user does not exist
+     * @throws EmailExistException    if the email address is already in use
      * @throws UserNameExistException if the user name is already in use
      */
     @Override
@@ -99,7 +103,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throws UserNotFoundException, EmailExistException, UserNameExistException {
         validateNewUserNameAndEmail(StringUtils.EMPTY, userName, email);
         String password = generatePassword();
-        String userId = generateUserId() ;
+        String userId = generateUserId();
         String encodedPassword = encodePassword(password);
         User user = new User();
         user.setFirstName(firstName);
@@ -127,7 +131,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     private String generateUserId() {
         String userId = RandomStringUtils.randomNumeric(10);
-       User  currentUser = userRepository.findUserByUserId(userId);
+        User currentUser = userRepository.findUserByUserId(userId);
         while (currentUser != null) {
             userId = RandomStringUtils.randomNumeric(10);
             currentUser = userRepository.findUserByUserId(userId);
@@ -141,7 +145,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @return the URL of the temporary profile image
      */
     private String getTemporaryProfileImageUrl() {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/image/profile/temp").toUriString();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(USER_IMAGE_PROFILE_TEMP_PATH).toUriString();
     }
 
     /**
@@ -153,6 +157,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private String encodePassword(String password) {
         return passwordEncoder.encode(password);
     }
+
     /**
      * Generates a random alphabetic password.
      *
@@ -171,54 +176,73 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * already in use by any user, and throws an exception if they are.
      *
      * @param currentUserName the current username of the user (may be blank)
-     * @param newUserName the new username to validate
-     * @param newEmail the new email address to validate
+     * @param newUserName     the new username to validate
+     * @param newEmail        the new email address to validate
      * @return the current user, if the current username is not blank
-     * @throws UserNotFoundException if the current username is not blank and no such user exists
+     * @throws UserNotFoundException  if the current username is not blank and no such user exists
      * @throws UserNameExistException if the new username is already in use
-     * @throws EmailExistException if the new email address is already in use
+     * @throws EmailExistException    if the new email address is already in use
      */
     private User validateNewUserNameAndEmail(String currentUserName, String newUserName, String newEmail)
             throws UserNotFoundException, UserNameExistException, EmailExistException {
+        User userByNewUserName = findUserByUserName(newUserName);
+        User userByNewEmail = findUserByEmail(newEmail);
         if (StringUtils.isNotBlank(currentUserName)) {
             User currentUser = findUserByUserName(currentUserName);
             if (currentUser == null) {
-                throw new UserNotFoundException("No user found by username " + currentUserName);
+                throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUserName);
             }
-            User userByNewUserName = findUserByUserName(newUserName);
+
             if (userByNewUserName != null && currentUser.getId().equals(userByNewUserName.getId())) {
-                throw new UserNameExistException("Username already exists");
+                throw new UserNameExistException(USERNAME_ALREADY_EXISTS);
             }
-            User userByNewEmail = findUserByEmail(newEmail);
+
             if (userByNewEmail != null && currentUser.getId().equals(userByNewEmail.getId())) {
-                throw new EmailExistException("Email already exists");
+                throw new EmailExistException(EMAIL_ALREADY_EXISTS);
             }
             return currentUser;
         } else {
-            User userByUserName = findUserByUserName(newUserName);
-            if (userByUserName != null) {
-                throw new UserNameExistException("Username already exists");
+
+            if (userByNewUserName != null) {
+                throw new UserNameExistException(USERNAME_ALREADY_EXISTS);
             }
-            User userByEmail = findUserByEmail(newEmail);
-            if (userByEmail != null) {
-                throw new EmailExistException("Email already exists");
+
+            if (userByNewEmail != null) {
+                throw new EmailExistException(EMAIL_ALREADY_EXISTS);
             }
             return null;
         }
     }
 
+    /**
+     * This method retrieves a list of all registered users from the database.
+     *
+     * @return a list of users
+     */
     @Override
     public List<User> getUsers() {
-        return null;
+        return userRepository.findAll();
     }
 
+    /**
+     * This method finds a user by their username.
+     *
+     * @param userName the user's username
+     * @return the user, or null if no such user exists
+     */
     @Override
     public User findUserByUserName(String userName) {
-        return null;
+        return userRepository.findUserByUserName(userName);
     }
 
+    /**
+     * This method finds a user by their email address.
+     *
+     * @param email the user's email address
+     * @return the user, or null if no such user exists
+     */
     @Override
     public User findUserByEmail(String email) {
-        return null;
+        return userRepository.findUserByEmail(email);
     }
 }
