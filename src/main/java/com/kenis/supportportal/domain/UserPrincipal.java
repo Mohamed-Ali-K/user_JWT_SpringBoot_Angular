@@ -41,7 +41,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getNotLocked();
+        return user.getIsNotLocked();
     }
 
     @Override
@@ -51,6 +51,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getActive();
+        return user.getIsActive();
     }
 }
