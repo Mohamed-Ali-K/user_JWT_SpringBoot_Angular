@@ -9,11 +9,13 @@ import com.kenis.supportportal.exception.domain.ExceptionHandling;
 import com.kenis.supportportal.exception.domain.UserNameExistException;
 import com.kenis.supportportal.exception.domain.UserNotFoundException;
 import com.kenis.supportportal.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping(path = {"/","/user"})
 public class UserResource extends ExceptionHandling {
@@ -26,7 +28,8 @@ public class UserResource extends ExceptionHandling {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException, UserNameExistException {
-        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getEmail(), user.getUserName());
+        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail());
+        log.info("user :{}", newUser);
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }
 }
