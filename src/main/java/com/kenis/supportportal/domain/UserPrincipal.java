@@ -9,14 +9,31 @@ import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 
-
+/**
+ * A class representing a user's principal in the application's security system. This class implements the
+ * <p>
+ * {@link UserDetails} interface to provide information about the user's authorities and security-related properties.
+ *
+ * @author Mohamed Ali Kenis
+ * @version 1.0
+ */
 public class UserPrincipal implements UserDetails {
     private User user;
 
+    /**
+     * Creates a new {@code UserPrincipal} instance with the given {@link User} object.
+     *
+     * @param user the user object
+     */
     public UserPrincipal(User user) {
         this.user = user;
     }
 
+    /**
+     * Returns the granted authorities for the user.
+     *
+     * @return the granted authorities for the user
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return stream(user.getAuthorities())
@@ -24,6 +41,10 @@ public class UserPrincipal implements UserDetails {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns the password for the user.
+     * @return the password for the user
+     */
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -31,7 +52,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUserName();
+        return user.getUsername();
     }
 
     @Override

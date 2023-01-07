@@ -18,7 +18,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+/**
+ * This class represents the security configuration for the application.
+ * It extends WebSecurityConfigurerAdapter and overrides its methods to provide
+ * custom security configurations for the application.
+ *
+ * @author Mohamed Ali Kenis
+ * @version 1.0
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -31,6 +38,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * Creates a new instance of the SecurityConfiguration class.
+     *
+     * @param jwtAuthorizationFilter The JWT authorization filter.
+     * @param jwtAccessDeniedHandler The JWT access denied handler.
+     * @param jwtAuthenticationEntryPoint The JWT authentication entry point.
+     * @param userDetailsService The user details service.
+     * @param bCryptPasswordEncoder The BCrypt password encoder.
+     */
     @Autowired
     public SecurityConfiguration (JwtAuthorizationFilter jwtAuthorizationFilter,
                                   JwtAccessDeniedHandler jwtAccessDeniedHandler,
@@ -47,11 +63,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
 
+    /**
+     * Configures the authentication manager.
+     *
+     * @param auth The authentication manager builder.
+     * @throws Exception If an error occurs while configuring the authentication manager.
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
+    /**
+     * Configures the HTTP security for the application.
+     *
+     * @param http The HTTP security configuration.
+     * @throws Exception If an error occurs while configuring the HTTP security.
+     */
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http

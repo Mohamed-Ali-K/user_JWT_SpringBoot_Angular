@@ -12,6 +12,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
+/**
+ * This class represents a user of the application. It contains information such as the user's id, first and last name,
+ * <p>
+ * username, password, email, profile image URL, last login date, join date, role, authorities, and whether the user is
+ * <p>
+ * active and not locked. It also overrides the equals and hashCode methods and includes a no-args constructor and a
+ * <p>
+ * constructor with all properties as arguments.
+ *
+ * @author Mohamed Ali Kenis
+ * @version 1.0
+ */
 @NoArgsConstructor
 @Getter
 @Setter
@@ -28,11 +40,11 @@ public class User implements Serializable {
             name = "id",
             nullable = false,
             updatable = false)
-    private Long id ;
+    private Long id;
 
 
     @Column(nullable = false)
-    private String userId ;
+    private String userId;
 
     @Column(nullable = false)
     private String firstName;
@@ -41,10 +53,9 @@ public class User implements Serializable {
     private String lastName;
 
     @Column(nullable = false)
-    private String userName;
+    private String username;
 
     @Column(nullable = false)
-    @JsonIgnore
     private String password;
 
 
@@ -77,11 +88,11 @@ public class User implements Serializable {
 
     //= Constructors ==
 
-    public User(String userId, String firstName, String lastName, String userName, String password, String email, String profileImageUrl, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, Boolean isActive, Boolean isNotLocked) {
+    public User(String userId, String firstName, String lastName, String username, String password, String email, String profileImageUrl, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, Boolean isActive, Boolean isNotLocked) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
@@ -101,12 +112,12 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(userId, user.userId) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(userName, user.userName) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(profileImageUrl, user.profileImageUrl) && Objects.equals(lastLoginDate, user.lastLoginDate) && Objects.equals(lastLoginDateDisplay, user.lastLoginDateDisplay) && Objects.equals(joinDate, user.joinDate) && Objects.equals(role, user.role) && Arrays.equals(authorities, user.authorities) && Objects.equals(isActive, user.isActive) && Objects.equals(isNotLocked, user.isNotLocked);
+        return Objects.equals(id, user.id) && Objects.equals(userId, user.userId) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(profileImageUrl, user.profileImageUrl) && Objects.equals(lastLoginDate, user.lastLoginDate) && Objects.equals(lastLoginDateDisplay, user.lastLoginDateDisplay) && Objects.equals(joinDate, user.joinDate) && Objects.equals(role, user.role) && Arrays.equals(authorities, user.authorities) && Objects.equals(isActive, user.isActive) && Objects.equals(isNotLocked, user.isNotLocked);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, userId, firstName, lastName, userName, password, email, profileImageUrl, lastLoginDate, lastLoginDateDisplay, joinDate, role, isActive, isNotLocked);
+        int result = Objects.hash(id, userId, firstName, lastName, username, password, email, profileImageUrl, lastLoginDate, lastLoginDateDisplay, joinDate, role, isActive, isNotLocked);
         result = 31 * result + Arrays.hashCode(authorities);
         return result;
     }

@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * <p>This method is used to load the user with the specified user name. It takes a single parameter,
      * {@code username}, which is the user name of the user to load. The method first tries to find the
-     * user with the specified user name using the {@link UserRepository#findUserByUserName(String)}
+     * user with the specified user name using the {@link UserRepository#findUserByUsername(String)}
      * method. If a user with the specified user name is not found, it throws a
      * {@link UsernameNotFoundException} with an error message. If a user with the specified user name is
      * found, it updates the user's last login date and saves the updated user to the database using the
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByUserName(username);
+        User user = userRepository.findUserByUsername(username);
         if (user == null) {
             log.error(NO_USER_FOUND_BY_USERNAME + username);
             throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME  + username);
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = new User();
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setUserName(userName);
+        user.setUsername(userName);
         user.setEmail(email);
         user.setUserId(userId);
         user.setJoinDate(new Date());
@@ -232,7 +232,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public User findUserByUserName(String userName) {
-        return userRepository.findUserByUserName(userName);
+        return userRepository.findUserByUsername(userName);
     }
 
     /**

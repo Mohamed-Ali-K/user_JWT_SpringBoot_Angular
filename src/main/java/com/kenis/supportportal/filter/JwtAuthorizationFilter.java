@@ -19,15 +19,36 @@ import static com.kenis.supportportal.constant.SecurityConstant.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpStatus.*;
 
-
+/**
+ * This class represents a filter that handles authorization for the application.
+ * It checks for the presence of a valid JWT in the request header and verifies its authenticity.
+ * If the JWT is valid, it allows the request to proceed. Otherwise, it returns an access denied response.
+ *
+ * @author Mohamed Ali Kenis
+ * @version 1.0
+ */
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JWTTokenProvider jwtTokenProvider;
 
+    /**
+     * Creates a new instance of the JwtAuthorizationFilter class.
+     *
+     * @param jwtTokenProvider The JWT token provider.
+     */
     public JwtAuthorizationFilter(JWTTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /**
+     * Handles the request and response for the application.
+     *
+     * @param request The HTTP servlet request.
+     * @param response The HTTP servlet response.
+     * @param filterChain The filter chain.
+     * @throws ServletException If an error occurs while processing the request.
+     * @throws IOException If an error occurs while writing the response.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

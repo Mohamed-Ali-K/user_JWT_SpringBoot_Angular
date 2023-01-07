@@ -23,6 +23,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A class that provides utility methods for generating and verifying JWT tokens.
+ *
+ * The goal of this class is to provide methods for generating and verifying JWT tokens to be used for authentication and authorization in a Spring application.
+ * @author Mohamed Ali Kenis
+ */
 @Component
 public class JWTTokenProvider {
 
@@ -30,6 +36,13 @@ public class JWTTokenProvider {
     private String secret;
 
     //= Private Methods ==
+
+    /**
+     * Returns an array of claims extracted from the given JWT token.
+     *
+     * @param token the JWT token
+     * @return an array of claims extracted from the given JWT token
+     */
     private String[]  getClaimsFromToken(String token) {
         JWTVerifier verifier = getJWTVerifier();
         return verifier
@@ -38,6 +51,11 @@ public class JWTTokenProvider {
                 .asArray(String.class);
     }
 
+    /**
+     * Returns a JWTVerifier object that can be used to verify the given JWT token.
+     *
+     * @return a JWTVerifier object that can be used to verify the given JWT token
+     */
     private JWTVerifier getJWTVerifier() {
         JWTVerifier verifier;
         try{
@@ -52,6 +70,12 @@ public class JWTTokenProvider {
         return verifier;
     }
 
+    /**
+     * Returns an array of claims extracted from the given user principal.
+     *
+     * @param user the user principal
+     * @return an array of claims extracted from the given user principal
+     */
     private String[] getClaimsFromUser(UserPrincipal user) {
         List<String> authorities = new ArrayList<>();
         for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
@@ -60,6 +84,13 @@ public class JWTTokenProvider {
         return authorities.toArray(new String[0]);
     }
 
+    /**
+     * Returns true if the given JWT token has expired, false otherwise.
+     *
+     * @param verifier the JWTVerifier object used to verify the JWT token
+     * @param token the JWT token
+     * @return true if the given JWT token has expired, false otherwise
+     */
     private boolean isTokenExpired(JWTVerifier verifier, String token) {
         Date expiration = verifier.verify(token).getExpiresAt();
         return expiration.before(new Date());
@@ -67,6 +98,12 @@ public class JWTTokenProvider {
 
     //= Public Methods ==
 
+    /**
+     * Generates a JWT token for the given user principal.
+     *
+     * @param userPrincipal the user principal
+     * @return a JWT token for the given user principal
+     */
     public String generateJwtToken(UserPrincipal userPrincipal){
         String[] claim = getClaimsFromUser(userPrincipal);
         return JWT
@@ -80,6 +117,12 @@ public class JWTTokenProvider {
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 
+    /**
+     * Returns a list of GrantedAuthority objects extracted from the given JWT token.
+     *
+     * @param token the JWT token
+     * @return a list of GrantedAuthority objects extracted from the given JWT token
+     */
     public List<GrantedAuthority> getAuthorities(String token) {
         String[] claims = getClaimsFromToken(token);
         return stream(claims)
@@ -87,6 +130,14 @@ public class JWTTokenProvider {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns an {@link Authentication} object based on the given user name and granted authorities.
+     *
+     * @param userName the username
+     * @param authorities the granted authorities
+     * @param request the HTTP servlet request
+     * @return an {@link Authentication} object based on the given user name and granted authorities
+     */
     public Authentication getAuthentication (String userName,
                                              List<GrantedAuthority> authorities,
                                              HttpServletRequest request) {
@@ -99,11 +150,24 @@ public class JWTTokenProvider {
         return userPasswordAuthToken;
     }
 
+    /**
+     * Returns a boolean indicating whether the given JWT token is valid for the given user name.
+     *
+     * @param userName the username
+     * @param token the JWT token
+     * @return a boolean indicating whether the given JWT token is valid for the given user name
+     */
     public Boolean isTokenValid(String userName, String token) {
         JWTVerifier verifier = getJWTVerifier();
         return StringUtils.isNotBlank(userName) && !isTokenExpired(verifier, token);
     }
 
+    /**
+     * Returns the subject extracted from the given JWT token.
+     *
+     * @param token the JWT token
+     * @return the subject extracted from the given JWT token
+     */
     public String getSubject(String token) {
         JWTVerifier verifier = getJWTVerifier();
         return verifier.verify(token).getSubject();
