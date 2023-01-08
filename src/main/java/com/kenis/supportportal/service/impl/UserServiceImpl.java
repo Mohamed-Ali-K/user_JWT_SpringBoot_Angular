@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    private final LoginAttemptService loginAttemptService ;
+    private LoginAttemptService loginAttemptService ;
 
     /**
      * Constructs a new {@code UserServiceImpl} object with the given dependencies.
@@ -111,8 +111,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param user the user to validate the login attempt for
      */
     private void validateLoginAttempt(User user) {
-        if (user.getIsNotLocked()) {
-            if (loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+        if(user.getIsNotLocked()) {
+            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
                 user.setIsNotLocked(false);
             } else {
                 user.setIsNotLocked(true);
