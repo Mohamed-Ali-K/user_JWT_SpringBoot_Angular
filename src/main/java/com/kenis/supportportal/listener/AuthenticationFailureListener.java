@@ -50,10 +50,9 @@ public class AuthenticationFailureListener {
      * method to update the login attempts for the user.
      *
      * @param event the {@code AuthenticationFailureBadCredentialsEvent} event to process
-     * @throws ExecutionException if an exception is thrown while updating the login attempts for the user
      */
     @EventListener
-    public void onAuthenticationFailure(AuthenticationFailureBadCredentialsEvent event) throws ExecutionException {
+    public void onAuthenticationFailure(AuthenticationFailureBadCredentialsEvent event) {
         Object principal = event.getAuthentication().getPrincipal();
         if (principal instanceof String) {
             String username = (String) event.getAuthentication().getPrincipal();

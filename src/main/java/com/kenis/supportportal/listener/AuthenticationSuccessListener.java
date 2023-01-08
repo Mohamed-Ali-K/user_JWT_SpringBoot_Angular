@@ -51,10 +51,9 @@ public class AuthenticationSuccessListener {
      * {@link LoginAttemptService#evictUserFromLoginAttemptCache(String)} method to remove them from the cache.
      *
      * @param event the {@code AuthenticationSuccessEvent} event to process
-     * @throws ExecutionException if an exception is thrown while removing the user from the login attempts cache
      */
     @EventListener
-    public void onAuthenticationSuccess(AuthenticationSuccessEvent event) throws ExecutionException {
+    public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {
         Object principal = event.getAuthentication().getPrincipal();
         if (principal instanceof User) {
             User user = (User) event.getAuthentication().getPrincipal();
