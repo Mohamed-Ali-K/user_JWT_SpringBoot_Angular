@@ -5,6 +5,7 @@ import com.kenis.supportportal.exception.domain.EmailExistException;
 import com.kenis.supportportal.exception.domain.UserNameExistException;
 import com.kenis.supportportal.exception.domain.UserNotFoundException;
 
+import javax.mail.MessagingException;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public interface UserService {
      * @param email the user's email address
      * @return the registered user
      */
-    User register(String firstName, String lastName, String userName, String email) throws UserNotFoundException, EmailExistException, UserNameExistException;
+    User register(String firstName, String lastName, String userName, String email) throws UserNotFoundException, EmailExistException, UserNameExistException, MessagingException;
 
 
     /**
