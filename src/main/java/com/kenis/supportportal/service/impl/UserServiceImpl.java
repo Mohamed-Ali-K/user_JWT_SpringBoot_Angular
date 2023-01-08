@@ -6,6 +6,7 @@ import com.kenis.supportportal.exception.domain.EmailExistException;
 import com.kenis.supportportal.exception.domain.UserNameExistException;
 import com.kenis.supportportal.exception.domain.UserNotFoundException;
 import com.kenis.supportportal.repository.UserRepository;
+import com.kenis.supportportal.service.EmailService;
 import com.kenis.supportportal.service.LoginAttemptService;
 import com.kenis.supportportal.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.mail.MessagingException;
 import java.util.Date;
 import java.util.List;
 
@@ -31,10 +33,11 @@ import static com.kenis.supportportal.enumeration.Role.*;
 /**
  * Implementation of the {@link UserService} and {@link UserDetailsService} interfaces.
  *
- * <p>This class provides methods for managing users and for authenticating users using their user names.
+ * <p>This class provides methods for managing users and for authenticating users using their usernames.
  * It uses the {@link UserRepository} for storing and retrieving users from the database and the
  * {@link BCryptPasswordEncoder} for encoding user passwords. It also uses the {@link LoginAttemptService}
- * to check whether a user has exceeded the maximum number of login attempts.
+ * to check whether a user has exceeded the maximum number of login attempts. It also uses the {@link EmailService}
+ * to send emails.
  *
  * @author Mohamed Ali Kenis
  */
@@ -47,20 +50,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    private LoginAttemptService loginAttemptService ;
+    private final LoginAttemptService loginAttemptService ;
+
+    private final EmailService emailService;
 
     /**
      * Constructs a new {@code UserServiceImpl} object with the given dependencies.
      *
-     * @param userRepository the repository for storing and retrieving users from the database
-     * @param passwordEncoder the password encoder for encoding user passwords
+     * @param userRepository      the repository for storing and retrieving users from the database
+     * @param passwordEncoder     the password encoder for encoding user passwords
      * @param loginAttemptService the service for checking login attempts
+     * @param emailService        the service for sending emails
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
+        this.emailService = emailService;
     }
 
     /**
@@ -112,16 +119,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     private void validateLoginAttempt(User user) {
         if(user.getIsNotLocked()) {
-            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
-                user.setIsNotLocked(false);
-            } else {
-                user.setIsNotLocked(true);
-            }
+            user.setIsNotLocked(!loginAttemptService.hasExceededMaxAttempts(user.getUsername()));
         } else {
             loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
         }
     }
-
     /**
      * Registers a new user with the given information.
      * This method checks that the given username and email address are not already in use,
@@ -135,10 +137,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @throws UserNotFoundException  if the user does not exist
      * @throws EmailExistException    if the email address is already in use
      * @throws UserNameExistException if the username is already in use
+     * @throws MessagingException     if there was a problem sending the email with the new password
      */
     @Override
     public User register(String firstName, String lastName, String userName, String email)
-            throws UserNotFoundException, EmailExistException, UserNameExistException {
+            throws UserNotFoundException, EmailExistException, UserNameExistException, MessagingException {
         validateNewUserNameAndEmail(StringUtils.EMPTY, userName, email);
         String password = generatePassword();
         String userId = generateUserId();
@@ -157,6 +160,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAuthorities(ROLE_USER.getAuthorities());
         user.setProfileImageUrl(getTemporaryProfileImageUrl());
         userRepository.save(user);
+        emailService.sendNewPasswordEmail(firstName,password,email);
         log.info("New user password : " + password);
 
         return user;
