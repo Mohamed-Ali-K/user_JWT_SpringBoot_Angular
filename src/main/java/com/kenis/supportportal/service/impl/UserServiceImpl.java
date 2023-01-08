@@ -6,6 +6,7 @@ import com.kenis.supportportal.exception.domain.EmailExistException;
 import com.kenis.supportportal.exception.domain.UserNameExistException;
 import com.kenis.supportportal.exception.domain.UserNotFoundException;
 import com.kenis.supportportal.repository.UserRepository;
+import com.kenis.supportportal.service.LoginAttemptService;
 import com.kenis.supportportal.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,7 +33,8 @@ import static com.kenis.supportportal.enumeration.Role.*;
  *
  * <p>This class provides methods for managing users and for authenticating users using their user names.
  * It uses the {@link UserRepository} for storing and retrieving users from the database and the
- * {@link BCryptPasswordEncoder} for encoding user passwords.
+ * {@link BCryptPasswordEncoder} for encoding user passwords. It also uses the {@link LoginAttemptService}
+ * to check whether a user has exceeded the maximum number of login attempts.
  *
  * @author Mohamed Ali Kenis
  */
@@ -45,27 +47,37 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private final LoginAttemptService loginAttemptService ;
+
+    /**
+     * Constructs a new {@code UserServiceImpl} object with the given dependencies.
+     *
+     * @param userRepository the repository for storing and retrieving users from the database
+     * @param passwordEncoder the password encoder for encoding user passwords
+     * @param loginAttemptService the service for checking login attempts
+     */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.loginAttemptService = loginAttemptService;
     }
 
     /**
-     * Loads the user with the specified user name.
+     * Loads the user with the specified username.
      *
-     * <p>This method is used to load the user with the specified user name. It takes a single parameter,
-     * {@code username}, which is the user name of the user to load. The method first tries to find the
-     * user with the specified user name using the {@link UserRepository#findUserByUsername(String)}
-     * method. If a user with the specified user name is not found, it throws a
-     * {@link UsernameNotFoundException} with an error message. If a user with the specified user name is
+     * <p>This method is used to load the user with the specified username. It takes a single parameter,
+     * {@code username}, which is the username of the user to load. The method first tries to find the
+     * user with the specified username using the {@link UserRepository#findUserByUsername(String)}
+     * method. If a user with the specified username is not found, it throws a
+     * {@link UsernameNotFoundException} with an error message. If a user with the specified username is
      * found, it updates the user's last login date and saves the updated user to the database using the
      * {@link UserRepository#save(User)} method. It then creates a new {@link UserPrincipal} object using
      * the found user and returns it.
      *
-     * @param username the user name of the user to load
+     * @param username the username of the user to load
      * @return the user details
-     * @throws UsernameNotFoundException if the user with the specified user name does not exist
+     * @throws UsernameNotFoundException if the user with the specified username does not exist
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -74,6 +86,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             log.error(NO_USER_FOUND_BY_USERNAME + username);
             throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME  + username);
         } else {
+            validateLoginAttempt(user);
             user.setLastLoginDate(user.getLastLoginDate());
             user.setLastLoginDate(new Date());
             userRepository.save(user);
@@ -85,18 +98,43 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     /**
+     * Validates the login attempt for the given user.
+     *
+     * <p>This method is used to validate the login attempt for the given user. If the user is not locked,
+     * it checks whether the user has exceeded the maximum number of login attempts using the
+     * {@link LoginAttemptService#hasExceededMaxAttempts(String)} method. If the user has exceeded the maximum
+     * number of login attempts, it sets the user's {@code isNotLocked} field to {@code false}. If the user has not
+     * exceeded the maximum number of login attempts, it sets the user's {@code isNotLocked} field to {@code true}.
+     * If the user is locked, it removes the user from the login attempt cache using the
+     * {@link LoginAttemptService#evictUserFromLoginAttemptCache(String)} method.
+     *
+     * @param user the user to validate the login attempt for
+     */
+    private void validateLoginAttempt(User user) {
+        if (user.getIsNotLocked()) {
+            if (loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+                user.setIsNotLocked(false);
+            } else {
+                user.setIsNotLocked(true);
+            }
+        } else {
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+        }
+    }
+
+    /**
      * Registers a new user with the given information.
      * This method checks that the given username and email address are not already in use,
      * and throws an exception if they are.
      *
      * @param firstName the first name of the user
      * @param lastName  the last name of the user
-     * @param userName  the user name of the user
+     * @param userName  the username of the user
      * @param email     the email address of the user
      * @return the registered user
      * @throws UserNotFoundException  if the user does not exist
      * @throws EmailExistException    if the email address is already in use
-     * @throws UserNameExistException if the user name is already in use
+     * @throws UserNameExistException if the username is already in use
      */
     @Override
     public User register(String firstName, String lastName, String userName, String email)
