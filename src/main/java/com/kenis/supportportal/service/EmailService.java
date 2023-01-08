@@ -1,6 +1,7 @@
 package com.kenis.supportportal.service;
 
 import com.sun.mail.smtp.SMTPTransport;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Message;
@@ -27,6 +28,23 @@ import static javax.mail.Message.RecipientType.*;
  */
 @Service
 public class EmailService {
+    /**
+     * The username to use when authenticating with the email server.
+     * you can you the Constant provided in Email Constant
+     * for the purpose of not sharing my username & password I will use the one in the
+     * ENVIRONMENT
+     */
+    @Value("${gmail.username}")
+    private String ENVIRONMENT_USERNAME;
+
+    /**
+     * The password to use when authenticating with the email server.
+     * you can you the Constant provided in Email Constant
+     * for the purpose of not sharing my username & password I will use the one in the
+     * ENVIRONMENT
+     */
+    @Value("${gmail.password}")
+    private String ENVIRONMENT_PASSWORD ;
 
     /**
      * Sends a new password email to the specified email address.
@@ -39,7 +57,7 @@ public class EmailService {
     public void sendNewPasswordEmail(String firstName, String password, String email) throws MessagingException {
         Message message = createEmail(firstName, password, email);
         SMTPTransport smtpTransport = (SMTPTransport) getEmailSession().getTransport(SIMPLE_MAIL_TRANSFER_PROTOCOL);
-        smtpTransport.connect(GMAIL_SMTP_SERVER, USERNAME, PASSWORD);
+        smtpTransport.connect(GMAIL_SMTP_SERVER, ENVIRONMENT_USERNAME, ENVIRONMENT_PASSWORD);
         smtpTransport.sendMessage(message, message.getAllRecipients());
         smtpTransport.close();
     }
