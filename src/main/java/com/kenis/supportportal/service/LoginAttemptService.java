@@ -1,6 +1,6 @@
 package com.kenis.supportportal.service;
 
-
+import lombok.extern.slf4j.Slf4j;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -34,17 +34,18 @@ import java.util.concurrent.TimeUnit;
  *    is not present in the cache.</li>
  * </ul>
  */
+@Slf4j
 @Service
 public class LoginAttemptService {
     /**
      * Maximum number of allowed login attempts before a user is considered to have exceeded the limit.
      */
-    private static final Integer MAXIMUM_NUMBER_OF_ATTEMPTS = 5;
+    private static final int MAXIMUM_NUMBER_OF_ATTEMPTS = 5;
 
     /**
      * Number by which to increment the login attempts for a user.
      */
-    private static final Integer ATTEMPTS_INCREMENT = 1;
+    private static final int ATTEMPTS_INCREMENT = 1;
 
     /**
      * Cache for storing login attempts for users. The keys are usernames and the values are the number of login attempts.
@@ -63,8 +64,7 @@ public class LoginAttemptService {
                 .expireAfterWrite(15, TimeUnit.MINUTES)
                 .maximumSize(100)
                 .build(new CacheLoader<String, Integer>() {
-                    @Override
-                    public Integer load(String key) throws Exception {
+                    public Integer load(String key) {
                         return 0;
                     }
                 });
@@ -90,7 +90,7 @@ public class LoginAttemptService {
         try {
             attempts = ATTEMPTS_INCREMENT + loginAttemptCache.get(username);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         loginAttemptCache.put(username, attempts);
 
@@ -107,7 +107,8 @@ public class LoginAttemptService {
         try {
             return loginAttemptCache.get(username) >= MAXIMUM_NUMBER_OF_ATTEMPTS;
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return false;
     }
 }
