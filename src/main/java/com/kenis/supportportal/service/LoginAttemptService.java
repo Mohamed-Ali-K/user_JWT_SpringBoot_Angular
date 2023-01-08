@@ -85,9 +85,13 @@ public class LoginAttemptService {
      * @param username the username of the user to add to the cache or increment the login attempts for
      * @throws ExecutionException if an exception is thrown while getting the current login attempts for the user
      */
-    public void addUserToLoginAttemptCache(String username) throws ExecutionException {
+    public void addUserToLoginAttemptCache(String username)  {
         int attempts = 0;
-        attempts = ATTEMPTS_INCREMENT + loginAttemptCache.get(username);
+        try {
+            attempts = ATTEMPTS_INCREMENT + loginAttemptCache.get(username);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
         loginAttemptCache.put(username, attempts);
 
     }
@@ -99,7 +103,11 @@ public class LoginAttemptService {
      * @return {@code true} if the user has exceeded the maximum allowed login attempts, {@code false} otherwise
      * @throws ExecutionException if an exception is thrown while getting the current login attempts for the user
      */
-    public boolean hasExceededMaxAttempts(String username) throws ExecutionException {
-        return loginAttemptCache.get(username) >= MAXIMUM_NUMBER_OF_ATTEMPTS;
+    public boolean hasExceededMaxAttempts(String username)  {
+        try {
+            return loginAttemptCache.get(username) >= MAXIMUM_NUMBER_OF_ATTEMPTS;
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
