@@ -139,8 +139,8 @@ public class ExceptionHandling implements ErrorController {
      * @return The method returns a ResponseEntity object with a status code of BAD_REQUEST (400) and a message indicating that the username already exists in the system.
      * @author Mohamed Ali KENIS
      */
-    @ExceptionHandler(UserNameExistException.class)
-    public ResponseEntity<HttpResponse> usernameExistException(UserNameExistException exception) {
+    @ExceptionHandler(UsernameExistException.class)
+    public ResponseEntity<HttpResponse> usernameExistException(UsernameExistException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

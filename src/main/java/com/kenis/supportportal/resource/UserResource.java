@@ -7,7 +7,7 @@ import com.kenis.supportportal.domain.User;
 import com.kenis.supportportal.domain.UserPrincipal;
 import com.kenis.supportportal.exception.domain.EmailExistException;
 import com.kenis.supportportal.exception.domain.ExceptionHandling;
-import com.kenis.supportportal.exception.domain.UserNameExistException;
+import com.kenis.supportportal.exception.domain.UsernameExistException;
 import com.kenis.supportportal.exception.domain.UserNotFoundException;
 import com.kenis.supportportal.service.UserService;
 import com.kenis.supportportal.utility.JWTTokenProvider;
@@ -62,7 +62,7 @@ public class UserResource extends ExceptionHandling {
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) {
         authenticate(user.getUsername(), user.getPassword());
-        User loginUser = userService.findUserByUserName(user.getUsername());
+        User loginUser = userService.findUserByUsername(user.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeaders = getJwtHeader(userPrincipal);
         return new ResponseEntity<>(loginUser, jwtHeaders, HttpStatus.OK);
@@ -75,10 +75,10 @@ public class UserResource extends ExceptionHandling {
      * @return the registered user's information
      * @throws UserNotFoundException if the user cannot be found
      * @throws EmailExistException if the email address is already registered
-     * @throws UserNameExistException if the username is already taken
+     * @throws UsernameExistException if the username is already taken
      */
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException, UserNameExistException, MessagingException {
+    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
         User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail());
         log.info("user :{}", newUser);
         return new ResponseEntity<>(newUser, HttpStatus.OK);

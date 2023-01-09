@@ -4,7 +4,7 @@ package com.kenis.supportportal.exception.domain;
  * Exception to be thrown when a user attempts to create an account with a
  * username that is already taken.
  */
-public class UserNameExistException extends Exception{
+public class UsernameExistException extends Exception{
 
     /**
      * Constructs a new exception with the specified detail message.
@@ -12,7 +12,7 @@ public class UserNameExistException extends Exception{
      * @param message the detail message. The detail message is saved for later
      *                retrieval by the {@link #getMessage()} method.
      */
-    public UserNameExistException(String message) {
+    public UsernameExistException(String message) {
         super(message);
     }
 }
