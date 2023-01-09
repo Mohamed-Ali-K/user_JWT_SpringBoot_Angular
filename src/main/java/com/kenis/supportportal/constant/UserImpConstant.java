@@ -20,4 +20,6 @@ public class UserImpConstant {
     public static final String RETURNING_FOUND_USER_BY_USERNAME = "returning found user by username: ";
     /** The constant for the temporary profile image URL. */
     public static final String USER_IMAGE_PROFILE_TEMP_PATH = "/user/image/profile/temp";
+    /** The constant for the message "No User Found for email". */
+    public static final String NO_USER_FOUND_BY_EMAIL = "No User Found for email: ";
 }
