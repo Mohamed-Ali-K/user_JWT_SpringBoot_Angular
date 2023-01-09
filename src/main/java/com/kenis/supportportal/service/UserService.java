@@ -34,7 +34,7 @@ public interface UserService {
      * @throws UsernameExistException if the username already exists
      * @throws MessagingException if there is an error sending an email
      */
-    User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException;
+    User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException, IOException;
 
 
     /**

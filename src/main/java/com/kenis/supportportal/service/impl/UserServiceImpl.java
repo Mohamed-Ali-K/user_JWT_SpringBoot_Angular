@@ -26,9 +26,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +46,7 @@ import static org.apache.commons.lang3.StringUtils.*;
  * Implementation of the {@link UserService} and {@link UserDetailsService} interfaces.
  *
  * <p>This class provides methods for managing users and for authenticating users using their usernames.
- * It uses the {@link UserRepository} for storing and retrieving users from the database and the
+ * It uses the {@link UserRepository#save(Object)} for storing and retrieving users from the database and the
  * {@link BCryptPasswordEncoder} for encoding user passwords. It also uses the {@link LoginAttemptService}
  * to check whether a user has exceeded the maximum number of login attempts. It also uses the {@link EmailService}
  * to send emails.
@@ -88,7 +91,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * method. If a user with the specified username is not found, it throws a
      * {@link UsernameNotFoundException} with an error message. If a user with the specified username is
      * found, it updates the user's last login date and saves the updated user to the database using the
-     * {@link UserRepository#save(User)} method. It then creates a new {@link UserPrincipal} object using
+     * {@link UserRepository#save(Object)} method. It then creates a new {@link UserPrincipal} object using
      * the found user and returns it.
      *
      * @param username the username of the user to load
@@ -121,7 +124,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param firstName the first name of the user
      * @param lastName  the last name of the user
-     * @param userName  the username of the user
+     * @param username  the username of the user
      * @param email     the email address of the user
      * @return the registered user
      * @throws UserNotFoundException  if the user does not exist
@@ -392,7 +395,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * If the current username is blank, this method checks that the new username and email address are not
      * already in use by any user, and throws an exception if they are.
      *
-     * @param currentUsername the current username of the user (may be blank)
+     * @param currentUsername the current username of the user (maybe blank)
      * @param newUsername     the new username to validate
      * @param newEmail        the new email address to validate
      * @return the current user, if the current username is not blank
@@ -456,10 +459,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * Saves the given profile image for the given user to the file system.
      *
      * <p>This method first checks if the given profile image is not null. If it is not, it creates a new
-     * directory on the file system for the user if it does not already exist, using the {@link Files#createDirectories(Path)}
+     * directory on the file system for the user if it does not already exist, using the {@link Files#createDirectories(Path, FileAttribute[])}
      * method. It then deletes any existing profile image for the user using the {@link Files#deleteIfExists(Path)}
      * method and saves the new profile image to the file system using the {@link Files#copy(InputStream, Path, CopyOption...)}
-     * method. It then updates the user's profile image URL in the database using the {@link UserRepository#save(User)}
+     * method. It then updates the user's profile image URL in the database using the {@link UserRepository#save(Object)}
      * method.
      *
      * @param user the user to save the profile image for
@@ -497,7 +500,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      *
      * @param role the name of the role, as a string
      * @return the role enum value with the specified name
-     * @throws IllegalArgumentException if the input string does not match the name of any of the enum values
+     * @throws IllegalArgumentException if the input string does not match the name of the enum values
      */
     private Role getRoleEnumName(String role) {
         return Role.valueOf(role.toUpperCase());
