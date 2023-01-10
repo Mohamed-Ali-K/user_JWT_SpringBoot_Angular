@@ -2,6 +2,7 @@ package com.kenis.supportportal.filter;
 
 
 import com.kenis.supportportal.utility.JWTTokenProvider;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,9 +51,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
      * @throws IOException If an error occurs while writing the response.
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         if (request.getMethod().equalsIgnoreCase(OPTIONS_HTTP_METHOD)) {
             response.setStatus(OK.value());
         } else {
@@ -62,10 +63,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
             String token = authorizationHeader.substring(TOKEN_PREFIX.length());
-            String userName = jwtTokenProvider.getSubject(token);
-            if (jwtTokenProvider.isTokenValid(userName, token) && SecurityContextHolder.getContext().getAuthentication() == null) {
+            String username = jwtTokenProvider.getSubject(token);
+            if (jwtTokenProvider.isTokenValid(username, token) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
-                Authentication authentication = jwtTokenProvider.getAuthentication(userName, authorities, request);
+                Authentication authentication = jwtTokenProvider.getAuthentication(username, authorities, request);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
                 SecurityContextHolder.clearContext();

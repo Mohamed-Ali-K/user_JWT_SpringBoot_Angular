@@ -6,7 +6,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,13 +31,12 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
      * @param response the response to send to the client
      * @param exception the exception that was thrown
      * @throws IOException if an I/O error occurs while handling the exception
-     * @throws ServletException if a servlet error occurs while handling the exception
      */
     @Override
     public void handle(
             HttpServletRequest request,
             HttpServletResponse response,
-            AccessDeniedException exception) throws IOException, ServletException {
+            AccessDeniedException exception) throws IOException {
         HttpResponse httpResponse = new HttpResponse(
                 UNAUTHORIZED.value(),
                 UNAUTHORIZED,

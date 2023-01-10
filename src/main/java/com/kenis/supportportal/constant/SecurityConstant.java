@@ -60,5 +60,5 @@ public class SecurityConstant {
     /**
      * An array of URLs that are public and do not require authentication.
      */
-    public static final String[] PUBLIC_URLS = {"**"};
+    public static final String[] PUBLIC_URLS = {"/user/login", "/user/register", "/user/resetPassword/**", "/user/image/**"};
 }
