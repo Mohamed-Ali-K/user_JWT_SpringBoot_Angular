@@ -72,7 +72,7 @@ public class UserResource extends ExceptionHandling {
      * @return the user's information and a JWT token in the response header
      */
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User user) {
+    public ResponseEntity<User> login(@RequestBody User user) throws UserNotFoundException {
         authenticate(user.getUsername(), user.getPassword());
         User loginUser = userService.findUserByUsername(user.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
@@ -214,7 +214,7 @@ public class UserResource extends ExceptionHandling {
      * @return the user with the given username and a status of OK
      */
     @GetMapping("/find/{username}")
-    public ResponseEntity<User> getUser(@PathVariable("username") String username){
+    public ResponseEntity<User> getUser(@PathVariable("username") String username) throws UserNotFoundException {
         User user = userService.findUserByUsername(username);
         return new ResponseEntity<>(user,OK);
     }

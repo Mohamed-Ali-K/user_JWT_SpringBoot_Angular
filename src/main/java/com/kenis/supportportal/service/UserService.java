@@ -51,7 +51,7 @@ public interface UserService {
      * @param username the user's username
      * @return the user, or null if no such user exists
      */
-    User findUserByUsername(String username);
+    User findUserByUsername(String username) throws UserNotFoundException;
 
 
     /**
