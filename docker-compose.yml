@@ -1,24 +1,36 @@
-# Use postgres/example user/password credentials
 version: '3.1'
-
 services:
-
   db:
-    container_name: supportportal
+    container_name: postgres
     image: postgres
     environment:
-      POSTGRES_USER : ${db_username}
-      POSTGRES_PASSWORD: ${db_password}
-      PGDATA: /data/postgres
+      POSTGRES_USER: broton
+      POSTGRES_PASSWORD: secret
     volumes:
-      - db:/data/postgres
+      - db:/var/lib/postgresql/data
     ports:
-      - "5332:5432"
+      - "5432:5432"
     networks:
       - db
-    restart : unless-stopped
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ell.patron91@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "80:80"
+    networks:
+      - db
+    restart: unless-stopped
+
 networks:
   db:
     driver: bridge
 volumes:
   db:
+  pgadmin_data:
