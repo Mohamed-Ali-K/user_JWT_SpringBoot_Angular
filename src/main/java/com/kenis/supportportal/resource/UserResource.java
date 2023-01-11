@@ -6,6 +6,7 @@ import com.kenis.supportportal.domain.User;
 import com.kenis.supportportal.domain.UserPrincipal;
 import com.kenis.supportportal.exception.domain.*;
 import com.kenis.supportportal.service.UserService;
+import com.kenis.supportportal.utility.FieldsValidations;
 import com.kenis.supportportal.utility.JWTTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class UserResource extends ExceptionHandling {
     public static final String PASSWORD_EMAIL_SEND_TO = "An email with new password was send to ";
     public static final String DELETED_SUCCESSFULLY_USER_ID = "The user was deleted successfully, user id: ";
     private final UserService userService;
+    private final FieldsValidations validations;
     private final AuthenticationManager authenticationManager;
     private final JWTTokenProvider jwtTokenProvider;
 
@@ -54,13 +56,15 @@ public class UserResource extends ExceptionHandling {
      * authentication manager, and JWT token provider.
      *
      * @param userService           the user service
+     * @param validations           the validation 
      * @param authenticationManager the authentication manager
      * @param jwtTokenProvider      the JWT token provider
      */
     @Autowired
-    public UserResource(UserService userService, AuthenticationManager authenticationManager,
+    public UserResource(UserService userService, FieldsValidations validations, AuthenticationManager authenticationManager,
                         JWTTokenProvider jwtTokenProvider) {
         this.userService = userService;
+        this.validations = validations;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -72,7 +76,8 @@ public class UserResource extends ExceptionHandling {
      * @return the user's information and a JWT token in the response header
      */
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User user) {
+    public ResponseEntity<User> login(@RequestBody User user) throws BlankFieldException {
+        validations.validateFieldsLogin(user.getUsername(),user.getPassword());
         authenticate(user.getUsername(), user.getPassword());
         User loginUser = userService.findUserByUsername(user.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
@@ -91,7 +96,7 @@ public class UserResource extends ExceptionHandling {
      */
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException,
-            UsernameExistException, MessagingException, IOException {
+            UsernameExistException, MessagingException, IOException, BlankFieldException {
         User newUser = userService.register(user.getFirstName(), user.getLastName(),
                 user.getUsername(), user.getEmail());
         log.info("user :{}", newUser);
@@ -159,7 +164,7 @@ public class UserResource extends ExceptionHandling {
             @RequestParam("isNotLock") String isNotLock,
             @RequestParam("isActive") String isActive,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
-    ) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException {
+    ) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException, BlankFieldException {
         User updatedUser = userService.updateUser(
                 currentUsername, newFirstName, newLastName, newUsername, newEmail, role,
                 Boolean.parseBoolean(isNotLock), Boolean.parseBoolean(isActive),profileImage);
@@ -187,7 +192,7 @@ public class UserResource extends ExceptionHandling {
      */
     @GetMapping("/reset-password/{email}")
     public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email)
-            throws EmailNotFoundException, MessagingException {
+            throws EmailNotFoundException, MessagingException, BlankFieldException {
         userService.resetPassword(email);
         return response(OK, PASSWORD_EMAIL_SEND_TO + email);
     }

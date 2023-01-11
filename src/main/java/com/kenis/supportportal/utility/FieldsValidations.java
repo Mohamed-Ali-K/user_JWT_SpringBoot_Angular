@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,16 +56,14 @@ public class FieldsValidations {
     }
 
     public void validateFields(List<Field> fields) throws BlankFieldException {
-        List<Field> invalidFields = fields.stream()
-                .filter(f -> isBlank(f.getValue())).toList();
-        if (!invalidFields.isEmpty()) {
-            List<String> invalidFieldsNames = new ArrayList<>();
-            invalidFields.forEach(field -> invalidFieldsNames.add(field.getName()));
-            if (invalidFieldsNames.size() == 1) {
-                throw new BlankFieldException(invalidFieldsNames.stream().map(String::valueOf).collect(Collectors.joining(",")) + " is" + BLANK_FIELD_MESSAGE );
-            } else {
-                throw new BlankFieldException(invalidFieldsNames.stream().map(String::valueOf).collect(Collectors.joining(",")) + " are" + BLANK_FIELD_MESSAGE);
-            }
+        List<String> invalidFieldsNames = fields.stream()
+                .filter(f -> isBlank(f.getValue()))
+                .map(Field::getName)
+                .collect(Collectors.toList());
+        if (!invalidFieldsNames.isEmpty()) {
+            String joinedNames = String.join(", ", invalidFieldsNames);
+            String message = invalidFieldsNames.size() == 1 ? joinedNames + " is" : joinedNames + " are";
+            throw new BlankFieldException(message + BLANK_FIELD_MESSAGE);
         }
     }
 }

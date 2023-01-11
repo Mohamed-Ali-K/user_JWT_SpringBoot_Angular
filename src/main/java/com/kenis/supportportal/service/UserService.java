@@ -31,7 +31,7 @@ public interface UserService {
      * @throws UsernameExistException if the username already exists
      * @throws MessagingException if there is an error sending an email
      */
-    User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException, IOException;
+    User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException, IOException, BlankFieldException;
 
 
     /**
@@ -105,7 +105,7 @@ public interface UserService {
             String role,
             boolean isNotLocked,
             boolean isActive,
-            MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException;
+            MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, BlankFieldException;
 
     /**
      * Deletes the user with the given ID.
@@ -119,7 +119,7 @@ public interface UserService {
      *
      * @param email the email address of the user
      */
-    void resetPassword(String email) throws MessagingException, EmailNotFoundException;
+    void resetPassword(String email) throws MessagingException, EmailNotFoundException, BlankFieldException;
 
     /**
      * Updates the profile image for the user with the given username.

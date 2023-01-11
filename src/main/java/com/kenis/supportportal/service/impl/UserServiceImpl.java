@@ -138,7 +138,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public User register(String firstName, String lastName, String username, String email)
-            throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException {
+            throws UserNotFoundException, EmailExistException, UsernameExistException, MessagingException, BlankFieldException {
+        validations.validateFieldsRegistration(new FieldsValidations.FieldDTO(username,email,firstName,lastName));
         validateNewUserNameAndEmail(EMPTY, username, email);
         String password = generatePassword();
         String userId = generateUserId();
@@ -239,9 +240,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @throws IOException if there is an error saving the profile image
      */
     @Override
-    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException {
+    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, BlankFieldException {
+        validateUserFields(newFirstName,newLastName,newUsername,newEmail,role,isNotLocked,isActive);
         User currentUser = validateNewUserNameAndEmail(currentUsername, newUsername,newEmail);
-
         assert currentUser != null;
         currentUser.setFirstName(newFirstName);
         currentUser.setLastName(newLastName);
@@ -283,8 +284,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @throws EmailNotFoundException if no user with the given email address is found
      */
     @Override
-    public void resetPassword(String email) throws MessagingException, EmailNotFoundException {
-
+    public void resetPassword(String email) throws MessagingException, EmailNotFoundException, BlankFieldException {
+        validations.validationField("email",email);
         User user = userRepository.findUserByEmail(email);
         if (user==null) {
             throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL+ email);
