@@ -8,6 +8,7 @@ import com.kenis.supportportal.repository.UserRepository;
 import com.kenis.supportportal.service.EmailService;
 import com.kenis.supportportal.service.LoginAttemptService;
 import com.kenis.supportportal.service.UserService;
+import com.kenis.supportportal.utility.FieldsValidations;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.kenis.supportportal.utility.FieldsValidations.Field;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -63,6 +66,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final EmailService emailService;
 
+    private final FieldsValidations validations;
+
     /**
      * Constructs a new {@code UserServiceImpl} object with the given dependencies.
      *
@@ -70,13 +75,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param passwordEncoder     the password encoder for encoding user passwords
      * @param loginAttemptService the service for checking login attempts
      * @param emailService        the service for sending emails
+     * @param validations          the service for validate blank or empty fields
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, FieldsValidations validations) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
+        this.validations = validations;
     }
 
     /**
@@ -181,7 +188,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @throws IOException if there is an error saving the profile image
      */
     @Override
-    public User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException {
+    public User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, BlankFieldException {
+        validateUserFields(firstName,lastName,username,email,role,isNotLocked,isActive);
         validateNewUserNameAndEmail(EMPTY, username,email);
         String password = generatePassword();
         String userId = generateUserId();
@@ -328,9 +336,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public User findUserByUsername(String username) {
-
         return userRepository.findUserByUsername(username);
-
     }
 
     /**
@@ -344,18 +350,43 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findUserByEmail(email);
     }
 
+
+    @Override
+    public User getUser( String identifier) throws UserNotFoundException, BlankFieldException {
+        validations.validationField("identifier", identifier);
+        User user = null;
+        try {
+            Long id = Long.parseLong(identifier);
+            user = userRepository.findUserById(id);
+        } catch (NumberFormatException e) {
+            if (identifier.startsWith("ID_")) {
+                user = userRepository.findUserByUserId(identifier);
+            }else if (identifier.contains("@")) {
+                user = userRepository.findUserByEmail(identifier);
+            }else if(identifier.matches("^[a-zA-Z0-9._-]+$")) {
+                user = userRepository.findUserByUsername(identifier);
+            }
+        }
+        if (user == null) {
+            throw new UserNotFoundException(NO_USER_FOUND_BY_IDENTIFIER + identifier);
+        }
+        return user;
+    }
+
     /**
      * Generates a unique user ID that does not exist in the database.
      *
      * @return the generated unique user ID
      */
     private String generateUserId() {
+        String  preFix = "ID_";
         String userId = RandomStringUtils.randomNumeric(10);
         User currentUser = userRepository.findUserByUserId(userId);
         while (currentUser != null) {
             userId = RandomStringUtils.randomNumeric(10);
             currentUser = userRepository.findUserByUserId(userId);
         }
+        userId = preFix + userId;
         return userId;
     }
 
@@ -504,6 +535,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     private Role getRoleEnumName(String role) {
         return Role.valueOf(role.toUpperCase());
+    }
+
+    private void validateUserFields(String firstName, String lastName, String username, String email, String role, boolean isNotLocked, boolean isActive) throws BlankFieldException {
+        validations.validateFields(List.of(
+                new Field("First Name", firstName),
+                new Field("Last Name", lastName),
+                new Field("Username", username),
+                new Field("Email", email),
+                new Field("Role", role),
+                new Field("isNotLocked", String.valueOf(isNotLocked)),
+                new Field("isActive", String.valueOf(isActive))
+        ));
     }
 
 }

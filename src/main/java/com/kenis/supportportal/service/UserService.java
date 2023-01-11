@@ -50,6 +50,7 @@ public interface UserService {
      */
     User findUserByUsername(String username);
 
+    User getUser(String username) throws UserNotFoundException, BlankFieldException;
 
     /**
      * Finds a user by their email address.
@@ -79,7 +80,7 @@ public interface UserService {
             String email,
             String role,
             boolean isNotLocked,
-            boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException;
+            boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, BlankFieldException;
 
 /**
  * Updates the information for the user with the given username.

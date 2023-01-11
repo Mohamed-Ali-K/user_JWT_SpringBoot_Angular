@@ -124,7 +124,7 @@ public class UserResource extends ExceptionHandling {
             @RequestParam("isActive") String isActive,
             @RequestParam("isNotLock") String isNotLock,
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
-    ) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException {
+    ) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException, BlankFieldException {
         User user = userService.addNewUser(firstName, lastName, username, email, role,
                 Boolean.parseBoolean(isNotLock), Boolean.parseBoolean(isActive), profileImage);
         return new ResponseEntity<>(user, OK);
@@ -214,8 +214,8 @@ public class UserResource extends ExceptionHandling {
      * @return the user with the given username and a status of OK
      */
     @GetMapping("/find/{username}")
-    public ResponseEntity<User> getUser(@PathVariable("username") String username) {
-        User user = userService.findUserByUsername(username);
+    public ResponseEntity<User> getUser(@PathVariable("username") String username) throws UserNotFoundException, BlankFieldException {
+        User user = userService.getUser(username);
         return new ResponseEntity<>(user,OK);
     }
 
