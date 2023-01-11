@@ -3,6 +3,7 @@ import {environment} from "../../environments/environment.development";
 import {HttpClient, HttpErrorResponse, HttpResponse} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 
 @Injectable({
@@ -12,8 +13,10 @@ export class AuthenticationService {
   private host = environment.apiUrl;
   private token: string | null = null;
   private loggedInUsername: string | null = null;
+  private jwtHelper : JwtHelperService;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, jwtHelper : JwtHelperService) {
+    this.jwtHelper = jwtHelper;
   }
 
   public login(user: User): Observable<HttpResponse<any> | HttpErrorResponse> {
@@ -60,4 +63,24 @@ export class AuthenticationService {
     return this.token ;
   }
 
+  private isTokenValid(): boolean {
+    if (this.token != null && this.token != '') {
+      const { sub } = this.jwtHelper.decodeToken(this.token);
+      if (sub != null && sub !== '' && !this.jwtHelper.isTokenExpired(this.token)) {
+        this.loggedInUsername = sub;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public isLogin(): boolean {
+    this.loadToken();
+    if (this.isTokenValid()) {
+      return true;
+    } else {
+      this.logout();
+      return false;
+    }
+  }
 }
