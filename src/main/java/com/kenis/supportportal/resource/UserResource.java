@@ -72,7 +72,7 @@ public class UserResource extends ExceptionHandling {
      * @return the user's information and a JWT token in the response header
      */
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User user) throws UserNotFoundException {
+    public ResponseEntity<User> login(@RequestBody User user) {
         authenticate(user.getUsername(), user.getPassword());
         User loginUser = userService.findUserByUsername(user.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
@@ -185,7 +185,7 @@ public class UserResource extends ExceptionHandling {
      * @throws EmailNotFoundException if the email address is not associated with any user
      * @throws MessagingException if there is an error while sending the password reset email
      */
-    @GetMapping("/resetPassword/{email}")
+    @GetMapping("/reset-password/{email}")
     public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email)
             throws EmailNotFoundException, MessagingException {
         userService.resetPassword(email);
@@ -200,7 +200,7 @@ public class UserResource extends ExceptionHandling {
      * @return a response with a status of NO_CONTENT and a message indicating that the user was deleted successfully
      *
      */
-    @PostMapping("delete/{id}")
+    @DeleteMapping("delete/{id}")
     @PreAuthorize("hasAuthority('user:delete')")
     public ResponseEntity<HttpResponse> deletedUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
@@ -214,7 +214,7 @@ public class UserResource extends ExceptionHandling {
      * @return the user with the given username and a status of OK
      */
     @GetMapping("/find/{username}")
-    public ResponseEntity<User> getUser(@PathVariable("username") String username) throws UserNotFoundException {
+    public ResponseEntity<User> getUser(@PathVariable("username") String username) {
         User user = userService.findUserByUsername(username);
         return new ResponseEntity<>(user,OK);
     }
