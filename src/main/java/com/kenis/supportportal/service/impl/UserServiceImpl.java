@@ -3,10 +3,7 @@ package com.kenis.supportportal.service.impl;
 import com.kenis.supportportal.domain.User;
 import com.kenis.supportportal.domain.UserPrincipal;
 import com.kenis.supportportal.enumeration.Role;
-import com.kenis.supportportal.exception.domain.EmailExistException;
-import com.kenis.supportportal.exception.domain.EmailNotFoundException;
-import com.kenis.supportportal.exception.domain.UsernameExistException;
-import com.kenis.supportportal.exception.domain.UserNotFoundException;
+import com.kenis.supportportal.exception.domain.*;
 import com.kenis.supportportal.repository.UserRepository;
 import com.kenis.supportportal.service.EmailService;
 import com.kenis.supportportal.service.LoginAttemptService;
@@ -279,6 +276,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     @Override
     public void resetPassword(String email) throws MessagingException, EmailNotFoundException {
+
         User user = userRepository.findUserByEmail(email);
         if (user==null) {
             throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL+ email);
@@ -329,13 +327,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @return the user, or null if no such user exists
      */
     @Override
-    public User findUserByUsername(String username) throws UserNotFoundException {
+    public User findUserByUsername(String username) {
 
-        User user = userRepository.findUserByUsername(username);
-        if (user == null) {
-            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
-        }
-        return user;
+        return userRepository.findUserByUsername(username);
+
     }
 
     /**

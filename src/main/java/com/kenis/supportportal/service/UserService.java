@@ -1,10 +1,7 @@
 package com.kenis.supportportal.service;
 
 import com.kenis.supportportal.domain.User;
-import com.kenis.supportportal.exception.domain.EmailExistException;
-import com.kenis.supportportal.exception.domain.EmailNotFoundException;
-import com.kenis.supportportal.exception.domain.UsernameExistException;
-import com.kenis.supportportal.exception.domain.UserNotFoundException;
+import com.kenis.supportportal.exception.domain.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
@@ -51,7 +48,7 @@ public interface UserService {
      * @param username the user's username
      * @return the user, or null if no such user exists
      */
-    User findUserByUsername(String username) throws UserNotFoundException;
+    User findUserByUsername(String username);
 
 
     /**
