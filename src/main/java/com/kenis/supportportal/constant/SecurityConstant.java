@@ -10,7 +10,7 @@ public class SecurityConstant {
     /**
      * The expiration time for JWTs in the application, in milliseconds.
      */
-    public static final long EXPIRATION_TIM = 3_600_000; // 1 hour expressed in milliseconds
+    public static final long EXPIRATION_TIM = 86_400_000; // 1 day expressed in milliseconds
 
     /**
      * The prefix to be used in the 'Authorization' header of requests that contain a JWT.
