@@ -56,7 +56,7 @@ public class UserResource extends ExceptionHandling {
      * authentication manager, and JWT token provider.
      *
      * @param userService           the user service
-     * @param validations           the validation 
+     * @param validations           the validation
      * @param authenticationManager the authentication manager
      * @param jwtTokenProvider      the JWT token provider
      */
