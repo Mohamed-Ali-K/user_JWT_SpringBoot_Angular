@@ -5,14 +5,13 @@ import {Observable} from "rxjs";
 import {User} from "../model/user";
 
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
   private host = environment.apiUrl;
-  private token: string;
-  private loggedInUsername: string;
+  private token: string | null = null;
+  private loggedInUsername: string | null = null;
 
   constructor(private http: HttpClient) {
   }
@@ -31,17 +30,31 @@ export class AuthenticationService {
       );
   }
 
-  public logout(): void{
-   this.token = null;
-   this.loggedInUsername = null;
-   localStorage.removeItem('user');
-   localStorage.removeItem('token');
+  public logout(): void {
+    this.token = null;
+    this.loggedInUsername = null;
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     localStorage.removeItem('users');
   }
 
-  public saveToken(token:string): void{
+  public saveToken(token: string): void {
     this.token = token;
     localStorage.setItem('token', token);
   }
+
+  public addUserToLocalStorage(user: User): void {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  public getUserToLocalStorage(): User | null {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null ;
+  }
+
+  public loadToken(): void {
+    this.token = localStorage.getItem('token')
+  }
+
 
 }
