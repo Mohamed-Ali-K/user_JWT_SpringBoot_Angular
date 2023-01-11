@@ -21,6 +21,8 @@ public class UserImpConstant {
 
     /** The constant for the message "No User Found for email". */
     public static final String NO_USER_FOUND_BY_EMAIL = "No User Found for email: ";
+    public static final String NO_USER_FOUND_BY_IDENTIFIER = "No User Found by this Identifier: ";
+    public static final String BLANK_FIELD_MESSAGE = " a required field and cannot be empty or blank";
 
     //TODO add noBlank noEmpty for all user filed
 }

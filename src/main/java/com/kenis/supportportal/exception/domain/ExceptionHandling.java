@@ -168,6 +168,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(BlankFieldException.class)
+    public ResponseEntity<HttpResponse> BlankFieldException(BlankFieldException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     /**
      * The methodNotSupportedException() method handles the HttpRequestMethodNotSupportedException.
      * This exception is thrown when the request method being used (e.g. GET, POST, etc.) is not supported on the requested endpoint.
