@@ -48,4 +48,8 @@ export class UserService {
       });
   }
 
+  public deleteUser(identifier: string):Observable<any | HttpErrorResponse> {
+    return this.http.delete<any>(
+      `${this.host}user/updateProfileImage/${identifier}`);
+  }
 }
