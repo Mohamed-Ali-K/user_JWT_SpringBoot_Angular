@@ -4,12 +4,12 @@ import {Observable} from 'rxjs';
 import {AuthenticationService} from "../service/authentication.service";
 
 /**
- *
  * AuthInterceptor is an Angular HttpInterceptor that is responsible for adding the JWT token to the headers of all authenticated API requests.
  * It will automatically ignore requests to the unauthenticated endpoints: login, register, and reset-password.
- * @Injectable() decorator is used to inject other dependencies in the class.
- * @class AuthInterceptor
- * @implements {HttpInterceptor}
+ * @Injectable() decorator is used to make this class available to be injected as a dependency, by the Angular dependency injection system.
+ * @class AuthInterceptorThis class represents the AuthInterceptor that implements the HttpInterceptor interface, it means this class can be used to intercept HTTP requests and responses.
+ * @implements {HttpInterceptor} This class implements the HttpInterceptor interface, it means this class can be used to intercept HTTP requests and responses.
+ *
  */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
