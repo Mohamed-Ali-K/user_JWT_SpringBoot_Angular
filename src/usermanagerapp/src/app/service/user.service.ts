@@ -50,10 +50,18 @@ export class UserService {
 
   public deleteUser(identifier: string):Observable<any | HttpErrorResponse> {
     return this.http.delete<any>(
-      `${this.host}user/updateProfileImage/${identifier}`);
+      `${this.host}user/delete/${identifier}`);
   }
 
   public addUsersToLocalCache(users:User[]):void{
     localStorage.setItem('users',JSON.stringify(users) );
   }
+
+  public getUsersFromLocalCache():User[] | null{
+    const users = localStorage.getItem('users');
+    return users ? JSON.parse(users) : null;
+  }
+
+
+
 }
