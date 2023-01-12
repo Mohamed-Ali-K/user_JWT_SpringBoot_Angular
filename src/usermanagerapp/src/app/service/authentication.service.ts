@@ -19,7 +19,7 @@ export class AuthenticationService {
   /**
    * The base URL of the authentication service's API.
    */
-  private host = environment.apiUrl;
+  host = environment.apiUrl;
   /**
    * Token received from the server
    */
