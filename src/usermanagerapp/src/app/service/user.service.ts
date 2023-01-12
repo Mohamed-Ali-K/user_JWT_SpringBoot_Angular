@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment.development";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse, HttpEvent} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
 
@@ -14,19 +14,38 @@ export class UserService {
   }
 
   public getUsers(): Observable<User[] | HttpErrorResponse> {
-    return this.http.get<User[]>(`${this.host}user/list`);
+    return this.http.get<User[]>(
+      `${this.host}user/list`
+    );
   }
 
   public addUser(formData: FormData): Observable<User | HttpErrorResponse> {
-    return this.http.post<User>(`${this.host}user/add`,formData);
+    return this.http.post<User>(
+      `${this.host}user/add`,
+      formData);
   }
 
   public updateUser(formData: FormData): Observable<User | HttpErrorResponse> {
-    return this.http.post<User>(`${this.host}user/update`,formData);
+    return this.http.post<User>(
+      `${this.host}user/update`,
+      formData
+    );
   }
 
   public resetPassword(email: string): Observable<any| HttpErrorResponse> {
-    return this.http.get<User>(`${this.host}user/reset-password/${email}`);
+    return this.http.get<User>(
+      `${this.host}user/reset-password/${email}`
+    );
+  }
+
+  public updateUserImage(formData: FormData):Observable<HttpEvent<User> | HttpErrorResponse> {
+    return this.http.post<User>(
+      `${this.host}user/updateProfileImage`,
+      formData,
+      {
+        reportProgress:true,
+        observe:'events'
+      });
   }
 
 }
