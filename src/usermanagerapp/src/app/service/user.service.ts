@@ -62,6 +62,18 @@ export class UserService {
     return users ? JSON.parse(users) : null;
   }
 
-
+  public createUserFormDate(loggedInUserName: string, user: User, profileImage: File): FormData {
+    const formDate = new FormData();
+    formDate.append('currentUsername', loggedInUserName);
+    formDate.append('firstName', user.firstName);
+    formDate.append('lastName', user.lastName);
+    formDate.append('username', user.username);
+    formDate.append('email', user.email);
+    formDate.append('role', user.role);
+    formDate.append('isActive', JSON.stringify(user.active));
+    formDate.append('isNotLocked', JSON.stringify(user.notLocked));
+    formDate.append('profileImage', profileImage);
+    return formDate;
+  }
 
 }
