@@ -13,6 +13,12 @@ import {NotificationModule} from "./notification/notification.module";
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { UserComponent } from './user/user.component';
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { JwtModule} from "@auth0/angular-jwt";
+
+export function tokenGetter() {
+  return localStorage.getItem("token");
+}
 
 
 @NgModule({
@@ -28,7 +34,18 @@ import { UserComponent } from './user/user.component';
     HttpClientModule,
     BrowserAnimationsModule, // required animations module
     MaterialModule,
-    NotificationModule
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: tokenGetter,
+        allowedDomains: [],
+        disallowedRoutes: [],
+      },
+    }),
+    FormsModule,
+    ReactiveFormsModule,
+    NotificationModule,
+
+
   ],
   providers: [
     AuthenticationGuard,

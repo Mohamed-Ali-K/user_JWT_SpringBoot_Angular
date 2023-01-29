@@ -8,7 +8,7 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 /**
  * AuthenticationService handles user authentication by making
  * HTTP requests to a backend for login, logout and registration.
- * it also handle token management and storage of user data locally
+ * it also handles token management and storage of user data locally
  * @author Mohamed Ali Kenis
  * @version 1.0
  */
@@ -44,12 +44,13 @@ export class AuthenticationService {
    * @returns -  An observable of type `HttpResponse<any> | HttpErrorResponse`
    *  which means it is subscribing to the response of a http post request.
    */
-  public login(user: User): Observable<HttpResponse<any> | HttpErrorResponse> {
+  public login(user: User): Observable<HttpResponse<User> | HttpErrorResponse> {
     return this.http
-      .post<HttpResponse<any> | HttpErrorResponse>(
+      .post<User>(
         `${this.host}/user/login`, user, {observe: 'response'}
       );
   }
+
   /**
    * Send a registration request to the backend with the provided user's data
    *
@@ -78,16 +79,18 @@ export class AuthenticationService {
    * Save the received token in the service and local storage
    * @param token - JWT token received from the server
    */
-  public saveToken(token: string): void {
+  public saveToken(token: string | null): void {
     this.token = token;
-    localStorage.setItem('token', token);
+    if (typeof token === "string") {
+      localStorage.setItem('token', token);
+    }
   }
 
   /**
    * save the user data in the local storage
    * @param user - the user data to save
    */
-  public addUserToLocalStorage(user: User): void {
+  public addUserToLocalStorage(user: User | null): void {
     localStorage.setItem('user', JSON.stringify(user));
   }
   /**
