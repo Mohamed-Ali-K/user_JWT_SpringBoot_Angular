@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment.development";
-import {HttpClient, HttpErrorResponse, HttpResponse} from "@angular/common/http";
+import {HttpClient, HttpResponse} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {User} from "../model/user";
 import {JwtHelperService} from "@auth0/angular-jwt";
@@ -44,7 +44,7 @@ export class AuthenticationService {
    * @returns -  An observable of type `HttpResponse<any> | HttpErrorResponse`
    *  which means it is subscribing to the response of a http post request.
    */
-  public login(user: User): Observable<HttpResponse<User> | HttpErrorResponse> {
+  public login(user: User): Observable<HttpResponse<User>> {
     return this.http
       .post<User>(
         `${this.host}/user/login`, user, {observe: 'response'}
@@ -58,9 +58,9 @@ export class AuthenticationService {
    * @returns - An observable of type `User | HttpErrorResponse`
    * which means it is subscribing to the response of a http post request.
    */
-  public register(user: User): Observable<User | HttpErrorResponse> {
+  public register(user: User): Observable<User> {
     return this.http
-      .post<User | HttpErrorResponse>(
+      .post<User>(
         `${this.host}/user/register`, user
       );
   }
@@ -97,7 +97,7 @@ export class AuthenticationService {
    * Retrieves the user data from the local storage
    * @returns user - the user data saved in the local storage
    */
-  public getUserToLocalStorage(): User | null {
+  public getUserFromLocalStorage(): User | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null ;
   }

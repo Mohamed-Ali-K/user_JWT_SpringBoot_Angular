@@ -15,6 +15,8 @@ import { RegisterComponent } from './register/register.component';
 import { UserComponent } from './user/user.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { JwtModule} from "@auth0/angular-jwt";
+import {MatIconModule} from "@angular/material/icon";
+import {MatSidenavModule} from "@angular/material/sidenav";
 
 export function tokenGetter() {
   return localStorage.getItem("token");
@@ -28,25 +30,27 @@ export function tokenGetter() {
     RegisterComponent,
     UserComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    BrowserAnimationsModule, // required animations module
-    MaterialModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter: tokenGetter,
-        allowedDomains: [],
-        disallowedRoutes: [],
-      },
-    }),
-    FormsModule,
-    ReactiveFormsModule,
-    NotificationModule,
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        BrowserAnimationsModule, // required animations module
+        MaterialModule,
+        JwtModule.forRoot({
+            config: {
+                tokenGetter: tokenGetter,
+                allowedDomains: [],
+                disallowedRoutes: [],
+            },
+        }),
+        FormsModule,
+        ReactiveFormsModule,
+        NotificationModule,
+        MatIconModule,
+        MatSidenavModule,
 
 
-  ],
+    ],
   providers: [
     AuthenticationGuard,
     {
