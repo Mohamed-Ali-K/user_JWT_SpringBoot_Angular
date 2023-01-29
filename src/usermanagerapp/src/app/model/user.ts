@@ -29,6 +29,10 @@ export class User {
    */
   public email: string;
   /**
+   * The user's password
+   */
+  public password: string;
+  /**
    * The date of the user's last login
    */
   public lastLoginDate: Date | null;
@@ -71,6 +75,7 @@ export class User {
     this.lastName = '';
     this.username = '';
     this.email = '';
+    this.password = '';
     this.lastLoginDate = null;
     this.lastLoginDateDisplay = null;
     this.joinDate = null;
