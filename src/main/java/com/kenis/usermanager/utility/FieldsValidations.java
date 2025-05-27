@@ -12,9 +12,18 @@ import java.util.stream.Collectors;
 import static com.kenis.usermanager.constant.UserImpConstant.BLANK_FIELD_MESSAGE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+/**
+ * Utility class for validating various fields within the application.
+ * This class provides methods to check for blank or empty fields in contexts
+ * such as user registration, login, and other general field validations.
+ */
 @Component
 public class FieldsValidations {
 
+    /**
+     * Represents a field to be validated, containing its name (for error messages)
+     * and its value.
+     */
     @AllArgsConstructor
     @Data
     public static class Field {
@@ -22,6 +31,10 @@ public class FieldsValidations {
         private String value;
     }
 
+    /**
+     * Data Transfer Object (DTO) used for passing user registration-specific fields
+     * to validation methods.
+     */
     @Data
     @AllArgsConstructor
     public static class FieldDTO {
@@ -31,6 +44,12 @@ public class FieldsValidations {
         private String lastName;
     }
 
+    /**
+     * Validates fields required for user registration (username, email, first name, last name) from a {@code FieldDTO}.
+     *
+     * @param fieldDTO The {@code FieldDTO} object containing registration fields.
+     * @throws BlankFieldException if any of the required registration fields are blank.
+     */
     public void validateFieldsRegistration(FieldDTO fieldDTO) throws BlankFieldException {
         validateFields(
                 List.of(
@@ -42,6 +61,13 @@ public class FieldsValidations {
         );
     }
 
+    /**
+     * Validates fields required for user login (username, password).
+     *
+     * @param username The username provided for login.
+     * @param password The password provided for login.
+     * @throws BlankFieldException if username or password is blank.
+     */
     public void validateFieldsLogin(String username, String password) throws BlankFieldException {
         validateFields(
                 List.of(
@@ -51,10 +77,23 @@ public class FieldsValidations {
         );
     }
 
+    /**
+     * Validates a single field to ensure it is not blank.
+     *
+     * @param fieldName The name of the field being validated (used in the exception message).
+     * @param field The value of the field to validate.
+     * @throws BlankFieldException if the field is blank.
+     */
     public void validationField(String fieldName, String field) throws BlankFieldException {
         validateFields(List.of(new Field(fieldName, field)));
     }
 
+    /**
+     * Validates a list of {@code Field} objects, ensuring none of them are blank.
+     *
+     * @param fields A list of {@code Field} objects to validate.
+     * @throws BlankFieldException if any field in the list is blank.
+     */
     public void validateFields(List<Field> fields) throws BlankFieldException {
         List<String> invalidFieldsNames = fields.stream()
                 .filter(f -> isBlank(f.getValue()))

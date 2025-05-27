@@ -42,21 +42,15 @@ public class ExceptionHandling implements ErrorController {
     private static final String NOT_ENOUGH_PERMISSION = "You do not have enough permission";
     public static final String ERROR_PATH = "/error";
 
-    //= Privet Methods ==
+    //= Privet Methods == // Should be "Private Methods"
 
     /**
-     * The createHttpResponse method is a private helper method that creates ResponseEntity object . The HttpResponse object contains the following fields:
+     * Creates a {@code ResponseEntity} containing a standardized {@code HttpResponse}.
+     * This private helper method is used by other exception handlers to ensure consistent response formats.
      *
-     * @value: an int representing the status code value
-     * @status: an HttpStatus enum representing the status code
-     * @reasonPhrase: a String representation of the reason phrase associated with the status code
-     * @message: a String representing a custom message provided as an argument to the method
-     * This method is used as a helper method in several other exception handler methods in the ExceptionHandling class to create and return a response to the client with the appropriate HttpStatus code and message in the body.
-     * @param httpStatus is an enumeration of HTTP status codes, as defined in the HTTP specification. It includes constants for all the common HTTP status codes, such as 200 (OK), 404 (Not Found), and 500 (Internal Server Error). These constants can be used to set the status code of an HTTP response, which can be useful for returning specific error messages or other information to the client.
-     * @param message parameter is a string representing the message to be included in the response body
-     * @return ResponseEntity object with a HttpResponse body and a specified HttpStatus code.
-     *
-     * @author Mohamed Ali KENIS
+     * @param httpStatus The {@link HttpStatus} for the response.
+     * @param message    The custom message to include in the response body.
+     * @return A {@code ResponseEntity<HttpResponse>} configured with the given status and message.
      */
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message) {
         HttpResponse httpResponse = new HttpResponse(
@@ -70,9 +64,9 @@ public class ExceptionHandling implements ErrorController {
     //= Public Methods ==
 
     /**
-     * The method accountDisabledException() handles the DisabledException, which is thrown when a user attempts to authenticate with a disabled account
-     * @return ResponseEntity with a BAD_REQUEST status code and a message saying that the account has been disabled.
-     * @author Mohamed Ali KENIS
+     * Handles {@link DisabledException}, thrown when a user attempts to authenticate with a disabled account.
+     *
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code BAD_REQUEST} and a message indicating the account is disabled.
      */
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<HttpResponse> accountDisabledException (){
@@ -80,20 +74,20 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * The method badCredentialsException() handles the BadCredentialsException
-     * This exception is thrown when the provided username or password is incorrect.
-     * @return ResponseEntity with a BAD_REQUEST status code and a message saying that the username or password is incorrect.
-     * @author Mohamed Ali KENIS
+     * Handles {@code BadCredentialsException} and returns a standardized {@code HttpResponse} with an {@code UNAUTHORIZED} status.
+     * This exception is typically thrown when the provided username or password is incorrect.
+     *
+     * @return A {@code ResponseEntity<HttpResponse>} containing the {@code HttpResponse}.
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<HttpResponse> badCredentialsException() {
-        return createHttpResponse(BAD_REQUEST, INCORRECT_CREDENTIALS);
+        return createHttpResponse(UNAUTHORIZED, INCORRECT_CREDENTIALS); // Corrected status to UNAUTHORIZED as per typical behavior for bad credentials
     }
 
     /**
-     * The accessDeniedException() method handles the AccessDeniedException
-     * @return ResponseEntity with a FORBIDDEN status code and a message saying that the user does not have enough permission.
-     * @author Mohamed Ali KENIS
+     * Handles {@link AccessDeniedException}, thrown when a user attempts to access a resource without sufficient permissions.
+     *
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code FORBIDDEN} and a message indicating insufficient permissions.
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<HttpResponse> accessDeniedException() {
@@ -101,9 +95,9 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * The lockedException() method handles the LockedException
-     * @return ResponseEntity with a UNAUTHORIZED status code and a message saying that the account has been locked.
-     * @author Mohamed Ali KENIS
+     * Handles {@link LockedException}, thrown when a user attempts to authenticate with a locked account.
+     *
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code UNAUTHORIZED} and a message indicating the account is locked.
      */
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<HttpResponse> lockedException() {
@@ -111,11 +105,10 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * The tokenExpiredException(TokenExpiredException exception) method handles the TokenExpiredException.
-     * which is thrown when the JWT token provided by the user has expired.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return ResponseEntity with a UNAUTHORIZED status code and the exception's message.
-     * @author Mohamed Ali KENIS
+     * Handles {@link TokenExpiredException}, thrown when a JWT token provided by the user has expired.
+     *
+     * @param exception The caught {@code TokenExpiredException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code UNAUTHORIZED} and the exception's message.
      */
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<HttpResponse> tokenExpiredException(TokenExpiredException exception) {
@@ -123,10 +116,10 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * The emailExistException(EmailExistException exception) method handles the EmailExistException, which is thrown when the provided email already exists in the system.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return The method returns a ResponseEntity object with a status code of BAD_REQUEST (400) and a message indicating that the email already exists in the system.
-     * @author Mohamed Ali KENIS
+     * Handles {@link EmailExistException}, thrown when an attempt is made to use an email that already exists in the system.
+     *
+     * @param exception The caught {@code EmailExistException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code BAD_REQUEST} and a message indicating the email already exists.
      */
     @ExceptionHandler(EmailExistException.class)
     public ResponseEntity<HttpResponse> emailExistException(EmailExistException exception) {
@@ -134,10 +127,10 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     *The usernameExistException(UserNameExistException exception) method handles the UserNameExistException, which is thrown when the provided username already exists in the system.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return The method returns a ResponseEntity object with a status code of BAD_REQUEST (400) and a message indicating that the username already exists in the system.
-     * @author Mohamed Ali KENIS
+     * Handles {@link UsernameExistException}, thrown when an attempt is made to use a username that already exists in the system.
+     *
+     * @param exception The caught {@code UsernameExistException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code BAD_REQUEST} and a message indicating the username already exists.
      */
     @ExceptionHandler(UsernameExistException.class)
     public ResponseEntity<HttpResponse> usernameExistException(UsernameExistException exception) {
@@ -145,11 +138,10 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * The emailNotFoundException(EmailNotFoundException exception) method handles the EmailNotFoundException.
-     * This exception is thrown when the provided email is not found in the system.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return ResponseEntity with a BAD_REQUEST status code and the exception's message.
-     * @author Mohamed Ali KENIS
+     * Handles {@link EmailNotFoundException}, thrown when a specified email is not found in the system.
+     *
+     * @param exception The caught {@code EmailNotFoundException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code BAD_REQUEST} and the exception's message.
      */
     @ExceptionHandler(EmailNotFoundException.class)
     public ResponseEntity<HttpResponse> emailNotFoundException(EmailNotFoundException exception) {
@@ -157,30 +149,33 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * The userNotFoundException() method is used to handle the UserNotFoundException.
-     * When this exception is thrown, it indicates that the provided username was not found in the system.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return This method returns a ResponseEntity object with a BAD_REQUEST status code and a message containing the exception message.
-     * @author Mohamed Ali KENIS
+     * Handles {@link UserNotFoundException}, thrown when a specified user is not found in the system.
+     *
+     * @param exception The caught {@code UserNotFoundException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code BAD_REQUEST} and the exception's message.
      */
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    /**
+     * Handles {@code BlankFieldException} and returns a standardized {@code HttpResponse} with a {@code BAD_REQUEST} status,
+     * including the exception message.
+     *
+     * @param exception The caught {@code BlankFieldException}.
+     * @return A {@code ResponseEntity} containing the {@code HttpResponse}.
+     */
     @ExceptionHandler(BlankFieldException.class)
-    public ResponseEntity<HttpResponse> BlankFieldException(BlankFieldException exception) {
+    public ResponseEntity<HttpResponse> blankFieldException(BlankFieldException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
     /**
-     * The methodNotSupportedException() method handles the HttpRequestMethodNotSupportedException.
-     * This exception is thrown when the request method being used (e.g. GET, POST, etc.) is not supported on the requested endpoint.
-     * The method creates a response with a METHOD_NOT_ALLOWED status code and a message indicating which request method is allowed on the endpoint.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return  ResponseEntity with a METHOD_NOT_ALLOWED status code and a message specifying the request method that is allowed on the endpoint.
-     * The message is constructed by formatting the METHOD_IS_NOT_ALLOWED string with the supported method obtained from the exception.
-     * @author Mohamed Ali KENIS
+     * Handles {@link HttpRequestMethodNotSupportedException}, thrown when an unsupported HTTP method is used for an endpoint.
+     *
+     * @param exception The caught {@code HttpRequestMethodNotSupportedException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code METHOD_NOT_ALLOWED} and a message specifying allowed methods.
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<HttpResponse> methodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
@@ -189,12 +184,11 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * This method is an exception handler for any type of exception that occurs in the application.
-     * It logs the error message and returns a response with an HTTP status of INTERNAL_SERVER_ERROR and a message saying
-     * "An error occurred while processing the request".
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return "An error occurred while processing the request" .
-     * @author Mohamed Ali KENIS
+     * Handles generic {@link Exception} instances, serving as a catch-all for unhandled exceptions.
+     * Logs the error and returns a standardized {@code HttpResponse} with status {@code INTERNAL_SERVER_ERROR}.
+     *
+     * @param exception The caught {@code Exception}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code INTERNAL_SERVER_ERROR} and a generic error message.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpResponse> internalServerErrorException(Exception exception) {
@@ -203,12 +197,11 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * This method is an exception handler for the NoResultException class.
-     * It is used to handle an exception that is thrown when a query returns no result.
-     * When this exception is thrown, it will log the error message and return a response with an HTTP status of NOT_FOUND and the exception message as the body.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return response with an HTTP status of NOT_FOUND and the exception message as the body.
-     * @author Mohamed Ali KENIS
+     * Handles {@link NoResultException}, typically thrown when a database query expecting a single result finds none.
+     * Logs the error and returns a standardized {@code HttpResponse} with status {@code NOT_FOUND}.
+     *
+     * @param exception The caught {@code NoResultException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code NOT_FOUND} and the exception's message.
      */
     @ExceptionHandler(NoResultException.class)
     public ResponseEntity<HttpResponse> notFoundException(NoResultException exception) {
@@ -217,12 +210,11 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * This method handles exceptions to type java.io.IOException.
-     * It logs the error message and returns a ResponseEntity with a HttpResponse object containing an HTTP status code of INTERNAL_SERVER_ERROR and a message of ERROR_PROCESSING_FILE.
-     * This method is likely used to handle exceptions that occur when there is an error reading or writing to a file.
-     * @param exception is an event, which occurs during the execution of a program, that disrupts the normal flow of the program's instructions. When an exception occurs, the normal flow of the program is interrupted and the program/system terminates abnormally. Exceptions are used to handle errors and other exceptional events that occur in a program, allowing the program to terminate gracefully and providing useful debugging information.
-     * @return ResponseEntity with a HttpResponse object containing an HTTP status code of INTERNAL_SERVER_ERROR and a message of ERROR_PROCESSING_FILE.
-     * @author Mohamed Ali KENIS
+     * Handles {@link IOException}, related to input/output operations.
+     * Logs the error and returns a standardized {@code HttpResponse} with status {@code INTERNAL_SERVER_ERROR}.
+     *
+     * @param exception The caught {@code IOException}.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code INTERNAL_SERVER_ERROR} and a message indicating a file processing error.
      */
     @ExceptionHandler(IOException.class)
     public ResponseEntity<HttpResponse> iOException(IOException exception) {
@@ -232,10 +224,9 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * This method is an exception handler for the "404 Not Found" HTTP error.
-     * When this error occurs, this method will be called and The response will be sent to the client.
-     * @return response with an HTTP status of "404 Not Found" and a message saying "There is no mapping for this URL".
-     * @author Mohamed Ali KENIS
+     * Handles requests to the "/error" path, typically for unmapped URLs, returning a 404 Not Found response.
+     *
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code NOT_FOUND} for unmapped URLs.
      */
     @RequestMapping(ERROR_PATH)
     public ResponseEntity<HttpResponse> notFound404() {
@@ -243,10 +234,10 @@ public class ExceptionHandling implements ErrorController {
     }
 
     /**
-     * This method returns the path of the error page. It is used to handle errors that occur during the execution of an application.
-     * This method is typically used in conjunction with the @RequestMapping annotation to map a specific URL to this error page.
-     * @return value, "/error", is the path of the error page.
-     * @author Mohamed Ali KENIS
+     * Returns the configured error path for the application.
+     * This is used by Spring Boot's error handling mechanisms.
+     *
+     * @return The error path string (e.g., "/error").
      */
     public String getErrorPath() {
         return ERROR_PATH;

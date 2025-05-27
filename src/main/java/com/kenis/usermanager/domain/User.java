@@ -87,6 +87,25 @@ public class User implements Serializable {
 
     //= Constructors ==
 
+    /**
+     * Constructs a new {@code User} with the specified details.
+     * (Note: Lombok's {@code @NoArgsConstructor} handles the no-arg constructor, this is the all-args constructor).
+     *
+     * @param userId The unique identifier for the user.
+     * @param firstName The first name of the user.
+     * @param lastName The last name of the user.
+     * @param username The username used for login.
+     * @param password The encoded password of the user.
+     * @param email The email address of the user.
+     * @param profileImageUrl The URL to the user's profile image.
+     * @param lastLoginDate The date of the user's last login.
+     * @param lastLoginDateDisplay The displayable date of the user's last login.
+     * @param joinDate The date when the user joined.
+     * @param role The role assigned to the user (e.g., "ROLE_USER").
+     * @param authorities An array of authorities granted to the user.
+     * @param isActive Indicates if the user's account is active.
+     * @param isNotLocked Indicates if the user's account is not locked.
+     */
     public User(String userId, String firstName, String lastName, String username, String password, String email, String profileImageUrl, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, Boolean isActive, Boolean isNotLocked) {
         this.userId = userId;
         this.firstName = firstName;
@@ -106,6 +125,12 @@ public class User implements Serializable {
 
     //= Equal & hashCode ==
 
+    /**
+     * Compares this {@code User} to the specified object for equality. Considers all fields for equality.
+     *
+     * @param o The object to compare this {@code User} against.
+     * @return {@code true} if the given object represents a {@code User} equivalent to this instance, {@code false} otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -114,6 +139,11 @@ public class User implements Serializable {
         return Objects.equals(id, user.id) && Objects.equals(userId, user.userId) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && Objects.equals(profileImageUrl, user.profileImageUrl) && Objects.equals(lastLoginDate, user.lastLoginDate) && Objects.equals(lastLoginDateDisplay, user.lastLoginDateDisplay) && Objects.equals(joinDate, user.joinDate) && Objects.equals(role, user.role) && Arrays.equals(authorities, user.authorities) && Objects.equals(isActive, user.isActive) && Objects.equals(isNotLocked, user.isNotLocked);
     }
 
+    /**
+     * Returns a hash code value for the {@code User} object. Calculated based on all fields.
+     *
+     * @return A hash code value for this object.
+     */
     @Override
     public int hashCode() {
         int result = Objects.hash(id, userId, firstName, lastName, username, password, email, profileImageUrl, lastLoginDate, lastLoginDateDisplay, joinDate, role, isActive, isNotLocked);
