@@ -42,6 +42,8 @@ import static com.kenis.usermanager.enumeration.Role.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.commons.lang3.StringUtils.*;
 
+import org.springframework.context.annotation.Profile;
+
 /**
  * Implementation of the {@link UserService} and {@link UserDetailsService} interfaces.
  *
@@ -536,6 +538,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      */
     private Role getRoleEnumName(String role) {
         return Role.valueOf(role.toUpperCase());
+    }
+
+    @Profile("test")
+    public User createUserForTest(String firstName, String lastName, String username, String email, String rawPassword, String roleName) throws EmailExistException, UsernameExistException, BlankFieldException {
+        validations.validateFieldsRegistration(new FieldsValidations.FieldDTO(username,email,firstName,lastName)); // Or a more suitable validation
+        validateNewUserNameAndEmail(EMPTY, username, email);
+        String userId = generateUserId(); // Existing private method
+        String encodedPassword = encodePassword(rawPassword); // Existing private method
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setUserId(userId);
+        user.setJoinDate(new Date());
+        user.setPassword(encodedPassword);
+        user.setIsActive(true);
+        user.setIsNotLocked(true);
+        Role role = getRoleEnumName(roleName); // Existing private method
+        user.setRole(role.name());
+        user.setAuthorities(role.getAuthorities());
+        user.setProfileImageUrl(getTemporaryProfileImageUrl(username)); // Existing private method
+        userRepository.save(user);
+        log.info("Test user created: {}", username);
+        return user;
     }
 
     private void validateUserFields(String firstName, String lastName, String username, String email, String role, boolean isNotLocked, boolean isActive) throws BlankFieldException {
