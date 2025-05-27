@@ -55,10 +55,10 @@ public class UserResource extends ExceptionHandling {
      * Constructs a new UserResource instance with the given user service,
      * authentication manager, and JWT token provider.
      *
-     * @param userService           the user service
-     * @param validations           the validation
-     * @param authenticationManager the authentication manager
-     * @param jwtTokenProvider      the JWT token provider
+     * @param userService           The service for user-related operations.
+     * @param validations           The service for field validations.
+     * @param authenticationManager The Spring security authentication manager.
+     * @param jwtTokenProvider      The utility for JWT token operations.
      */
     @Autowired
     public UserResource(UserService userService, FieldsValidations validations, AuthenticationManager authenticationManager,
@@ -70,10 +70,11 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a login request and returns the user's information and a JWT token in the response header.
+     * Handles a login request, authenticates the user, and returns the user's information along with a JWT token in the response header.
      *
-     * @param user the user's login credentials
-     * @return the user's information and a JWT token in the response header
+     * @param user The {@code User} object containing login credentials (username and password).
+     * @return A {@code ResponseEntity} containing the authenticated {@code User} and JWT token in headers.
+     * @throws BlankFieldException if username or password fields are blank.
      */
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) throws BlankFieldException {
@@ -86,13 +87,16 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a user registration request and returns the registered user's information.
+     * Handles a user registration request.
      *
-     * @param user the user's registration information
-     * @return the registered user's information
-     * @throws UserNotFoundException  if the user cannot be found
-     * @throws EmailExistException    if the email address is already registered
-     * @throws UsernameExistException if the username is already taken
+     * @param user The {@code User} object containing registration information (firstName, lastName, username, email).
+     * @return A {@code ResponseEntity} containing the newly registered {@code User} and HTTP status {@code OK}.
+     * @throws UserNotFoundException  If an issue arises with finding user-related data during registration (should be rare for new registration).
+     * @throws EmailExistException    If the provided email address is already registered.
+     * @throws UsernameExistException If the provided username is already taken.
+     * @throws MessagingException     If there is an error sending the registration confirmation email.
+     * @throws IOException            If an I/O error occurs (e.g. profile image handling if added to this method).
+     * @throws BlankFieldException    If any required registration fields are blank.
      */
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException,
@@ -102,22 +106,24 @@ public class UserResource extends ExceptionHandling {
         log.info("user :{}", newUser);
         return new ResponseEntity<>(newUser, OK);
     }
+
     /**
-     * Handles a request to add a new user.
+     * Handles the HTTP POST request to add a new user.
      *
-     * @param firstName the user's first name
-     * @param lastName the user's last name
-     * @param username the user's username
-     * @param email the user's email
-     * @param role the user's role
-     * @param isNotLock whether the user is locked
-     * @param isActive whether the user is active
-     * @param profileImage the user's profile image (optional)
-     * @return the added user's information and a status of OK
-     * @throws UserNotFoundException if the user cannot be found
-     * @throws EmailExistException if the email address is already in use
-     * @throws IOException if an error occurs while reading or writing the user's profile image
-     * @throws UsernameExistException if the username is already in use
+     * @param firstName The first name of the new user.
+     * @param lastName The last name of the new user.
+     * @param username The username for the new user.
+     * @param email The email address for the new user.
+     * @param role The role assigned to the new user.
+     * @param isActive String representation of whether the user is active ("true" or "false").
+     * @param isNotLock String representation of whether the user is not locked ("true" or "false").
+     * @param profileImage (Optional) The profile image file for the new user.
+     * @return A {@code ResponseEntity} containing the newly created {@code User} and HTTP status {@code OK}.
+     * @throws UserNotFoundException If an error occurs related to user not being found during underlying processes (though typically not expected for a new user).
+     * @throws EmailExistException If the provided email already exists.
+     * @throws IOException If an error occurs during profile image processing.
+     * @throws UsernameExistException If the provided username already exists.
+     * @throws BlankFieldException If any required field is blank.
      */
     @PostMapping("/add")
     public ResponseEntity<User> addNewUser(
@@ -136,22 +142,23 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to update a user's information.
+     * Handles the HTTP POST request to update an existing user's information.
      *
-     * @param currentUsername the current username of the user to update
-     * @param newFirstName the new first name for the user
-     * @param newLastName the new last name for the user
-     * @param newUsername the new username for the user
-     * @param newEmail the new email for the user
-     * @param role the new role for the user
-     * @param isNotLock whether the user is locked
-     * @param isActive whether the user is active
-     * @param profileImage the new profile image for the user (optional)
-     * @return the updated user's information and a status of OK
-     * @throws UserNotFoundException if the user to update cannot be found
-     * @throws EmailExistException if the new email address is already in use
-     * @throws IOException if an error occurs while reading or writing the user's profile image
-     * @throws UsernameExistException if the new username is already in use
+     * @param currentUsername The current username of the user to be updated.
+     * @param newFirstName The new first name for the user.
+     * @param newLastName The new last name for the user.
+     * @param newUsername The new username for the user.
+     * @param newEmail The new email address for the user.
+     * @param role The new role for the user.
+     * @param isNotLock String representation of whether the user should be not locked ("true" or "false").
+     * @param isActive String representation of whether the user should be active ("true" or "false").
+     * @param profileImage (Optional) The new profile image file for the user.
+     * @return A {@code ResponseEntity} containing the updated {@code User} and HTTP status {@code OK}.
+     * @throws UserNotFoundException If the user with {@code currentUsername} is not found.
+     * @throws EmailExistException If the {@code newEmail} already exists for another user.
+     * @throws IOException If an error occurs during profile image processing.
+     * @throws UsernameExistException If the {@code newUsername} already exists for another user.
+     * @throws BlankFieldException If any required field for the update is blank.
      */
     @PostMapping("/update")
     public ResponseEntity<User> updateUser(
@@ -172,9 +179,9 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to retrieve a list of all users.
+     * Retrieves a list of all users.
      *
-     * @return a list of all users and a status of OK
+     * @return A {@code ResponseEntity} containing a list of all {@code User} objects and HTTP status {@code OK}.
      */
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers(){
@@ -183,12 +190,13 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to reset a user's password.
+     * Initiates a password reset process for the user with the given email address.
      *
-     * @param email the email of the user to reset the password for
-     * @return a response with a status of OK and a message indicating that an email with the new password was sent
-     * @throws EmailNotFoundException if the email address is not associated with any user
-     * @throws MessagingException if there is an error while sending the password reset email
+     * @param email The email address of the user whose password needs to be reset.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code OK} and a success message.
+     * @throws EmailNotFoundException If the email address is not associated with any user.
+     * @throws MessagingException If there is an error while sending the password reset email.
+     * @throws BlankFieldException If the provided email is blank.
      */
     @GetMapping("/reset-password/{email}")
     public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email)
@@ -198,12 +206,10 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to delete a user.
-     *<br>
-     *the preAuthorize the user making the request must have the 'user:delete' authority
-     * @param id the id of the user to delete
-     * @return a response with a status of NO_CONTENT and a message indicating that the user was deleted successfully
+     * Deletes a user by their ID. Access is restricted to users with 'user:delete' authority.
      *
+     * @param id The ID of the user to delete.
+     * @return A {@code ResponseEntity<HttpResponse>} with status {@code NO_CONTENT} and a success message.
      */
     @DeleteMapping("delete/{id}")
     @PreAuthorize("hasAuthority('user:delete')")
@@ -213,10 +219,12 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to retrieve a user by their username.
+     * Retrieves a user by their username (or other identifier as processed by {@code userService.getUser}).
      *
-     * @param username the username of the user to retrieve
-     * @return the user with the given username and a status of OK
+     * @param username The username or identifier of the user to retrieve.
+     * @return A {@code ResponseEntity} containing the found {@code User} and HTTP status {@code OK}.
+     * @throws UserNotFoundException if the user is not found.
+     * @throws BlankFieldException if the provided username is blank.
      */
     @GetMapping("/find/{username}")
     public ResponseEntity<User> getUser(@PathVariable("username") String username) throws UserNotFoundException, BlankFieldException {
@@ -227,10 +235,10 @@ public class UserResource extends ExceptionHandling {
     /**
      * Handles a request to retrieve a user's profile image by their username and file name.
      *
-     * @param username the username of the user whose profile image to retrieve
-     * @param fileName the file name of the profile image to retrieve
-     * @return the user's profile image as a byte array
-     * @throws IOException if there is an error reading the file
+     * @param username The username of the user whose profile image is to be retrieved.
+     * @param fileName The name of the image file.
+     * @return A byte array containing the profile image data.
+     * @throws IOException If an error occurs while reading the image file.
      */
     @GetMapping(path =  "/image/{username}/{fileName}",produces = IMAGE_JPEG_VALUE)
     public byte[] getProfileImage(
@@ -239,14 +247,11 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to retrieve a user's temporary profile image by their username.
-     * This method first creates a URL using the given username and a base URL defined in the
-     * {@code TEMP_PROFILE_IMAGE_BASE_URL} constant. It then reads the image from the URL and returns it
-     * as a byte array.
+     * Retrieves a temporary profile image for a user, typically from an external service (e.g., Robohash).
      *
-     * @param username the username of the user whose temporary profile image to retrieve
-     * @return the user's temporary profile image as a byte array
-     * @throws IOException if there is an error reading the image from the URL
+     * @param username The username for whom to fetch the temporary profile image.
+     * @return A byte array containing the temporary profile image data.
+     * @throws IOException If an error occurs while fetching or reading the image from the URL.
      */
     @GetMapping(path =  "/image/profile/{username}",produces = IMAGE_JPEG_VALUE)
     public byte[] getTempProfileImage(
@@ -264,19 +269,21 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Handles a request to update the profile image of a user.
+     * Handles the HTTP POST request to update a user's profile image.
      *
-     * @param username the username of the user whose profile image is being updated
-     * @param newProfileImage the new profile image for the user
-     * @return the updated user information
-     * @throws UserNotFoundException if the user with the given username cannot be found
-     * @throws IOException if there is an error reading or writing the profile image file
+     * @param username The username of the user whose profile image is to be updated.
+     * @param newProfileImage The new profile image file.
+     * @return A {@code ResponseEntity} containing the updated {@code User} (with the new profile image URL) and HTTP status {@code OK}.
+     * @throws UserNotFoundException If the user with {@code username} is not found.
+     * @throws EmailExistException If an email-related conflict occurs during the update (should be reviewed if only image is updated).
+     * @throws IOException If an error occurs during profile image processing.
+     * @throws UsernameExistException If a username-related conflict occurs during the update (should be reviewed if only image is updated).
      */
     @PostMapping("/updateProfileImage")
     public ResponseEntity<User> updateProfileImage(
             @RequestParam("username") String username,
             @RequestParam(value = " newProfileImage") MultipartFile  newProfileImage
-    ) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException {
+    ) throws UserNotFoundException, EmailExistException, IOException, UsernameExistException { // Added missing BlankFieldException if username could be blank
         User user = userService.updateProfileImage(username, newProfileImage);
         return new ResponseEntity<>(user, OK);
     }
@@ -284,10 +291,10 @@ public class UserResource extends ExceptionHandling {
     //= Private Methods ==
 
     /**
-     * Returns an HttpHeaders object with a JWT token in the "Authorization" header.
+     * Generates HTTP headers containing a JWT token for the given user principal.
      *
-     * @param userPrincipal the user principal
-     * @return an HttpHeaders object with a JWT token in the "Authorization" header
+     * @param userPrincipal The user principal for whom to generate the token.
+     * @return {@code HttpHeaders} object with the JWT token added to the {@code JWT_TOKEN_HEADER}.
      */
     private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {
         HttpHeaders headers = new HttpHeaders();
@@ -296,10 +303,11 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Authenticates the user with the given username and password.
+     * Authenticates a user using the Spring {@code AuthenticationManager}.
      *
-     * @param userName the username
-     * @param password the password
+     * @param userName The username to authenticate.
+     * @param password The password for the given username.
+     * @throws org.springframework.security.core.AuthenticationException if authentication fails (e.g., {@code BadCredentialsException}).
      */
     private void authenticate(String userName, String password) {
         authenticationManager.authenticate(
@@ -307,15 +315,12 @@ public class UserResource extends ExceptionHandling {
     }
 
     /**
-     * Creates and returns a {@link ResponseEntity} object with a {@link HttpResponse} object as the body
-     * and the given {@code httpStatus} as the status. The {@link HttpResponse} object has the given
-     * {@code message} as well as the {@code value} and {@code reasonPhrase} of the {@code httpStatus}
-     * set as its fields.
+     * Creates a standardized {@code ResponseEntity<HttpResponse>} object.
+     * This is a utility method for generating consistent API responses.
      *
-     * @param httpStatus the status of the response
-     * @param message the message to include in the response body
-     * @return a {@link ResponseEntity} object with a {@link HttpResponse} object as the body
-     *         and the given {@code httpStatus} as the status
+     * @param httpStatus The {@code HttpStatus} for the response.
+     * @param message The message to include in the {@code HttpResponse} body.
+     * @return A {@code ResponseEntity} configured with the given status and message.
      */
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         HttpResponse httpResponse = new HttpResponse(

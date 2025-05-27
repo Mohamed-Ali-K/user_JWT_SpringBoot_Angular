@@ -97,6 +97,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
+    /**
+     * Exposes the Spring {@code AuthenticationManager} as a Bean.
+     *
+     * @return The configured {@code AuthenticationManager}.
+     * @throws Exception if an error occurs during configuration.
+     */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

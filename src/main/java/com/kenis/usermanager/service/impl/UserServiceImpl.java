@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param passwordEncoder     the password encoder for encoding user passwords
      * @param loginAttemptService the service for checking login attempts
      * @param emailService        the service for sending emails
-     * @param validations          the service for validate blank or empty fields
+     * @param validations          the service to validate blank or empty fields
      */
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, FieldsValidations validations) {
@@ -131,10 +131,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param username  the username of the user
      * @param email     the email address of the user
      * @return the registered user
-     * @throws UserNotFoundException  if the user does not exist
-     * @throws EmailExistException    if the email address is already in use
-     * @throws UsernameExistException if the username is already in use
-     * @throws MessagingException     if there was a problem sending the email with the new password
+     * @throws UserNotFoundException  if an error occurs during user validation (should be rare for registration).
+     * @throws EmailExistException    if the email address is already in use.
+     * @throws UsernameExistException if the username is already in use.
+     * @throws MessagingException     if there is an error sending the new password email.
+     * @throws BlankFieldException    if any of the required fields (firstName, lastName, username, email) are blank.
      */
     @Override
     public User register(String firstName, String lastName, String username, String email)
@@ -183,10 +184,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param isActive whether the user is active or not
      * @param profileImage the user's profile image
      * @return the added user
-     * @throws UserNotFoundException if the user does not exist
-     * @throws EmailExistException if the email address is already in use
-     * @throws UsernameExistException if the username is already in use
-     * @throws IOException if there is an error saving the profile image
+     * @throws UserNotFoundException if an error occurs during user validation.
+     * @throws EmailExistException if the email address is already in use.
+     * @throws UsernameExistException if the username is already in use.
+     * @throws IOException if there is an error saving the profile image.
+     * @throws BlankFieldException if any of the required fields are blank.
      */
     @Override
     public User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, BlankFieldException {
@@ -234,10 +236,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * @param isActive whether the user is active or not
      * @param profileImage the new profile image of the user
      * @return the updated user
-     * @throws UserNotFoundException if the user does not exist
-     * @throws EmailExistException if the new email address is already in use
-     * @throws UsernameExistException if the new username is already in use
-     * @throws IOException if there is an error saving the profile image
+     * @throws UserNotFoundException if the user with {@code currentUsername} does not exist.
+     * @throws EmailExistException if the new email address is already in use by another user.
+     * @throws UsernameExistException if the new username is already in use by another user.
+     * @throws IOException if there is an error saving the profile image.
+     * @throws BlankFieldException if any of the required fields for update are blank.
      */
     @Override
     public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNotLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, UsernameExistException, IOException, BlankFieldException {
@@ -279,9 +282,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
      * method. If no user with the given email address is found, it throws an {@link EmailNotFoundException}
      * with an error message.
      *
-     * @param email the email address of the user to reset the password for
-     * @throws MessagingException if there is an error sending the email
-     * @throws EmailNotFoundException if no user with the given email address is found
+     * @param email the email address of the user to reset the password for.
+     * @throws MessagingException if there is an error sending the email.
+     * @throws EmailNotFoundException if no user with the given email address is found.
+     * @throws BlankFieldException if the email field is blank.
      */
     @Override
     public void resetPassword(String email) throws MessagingException, EmailNotFoundException, BlankFieldException {
@@ -320,9 +324,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 
     /**
-     * This method retrieves a list of all registered users from the database.
+     * Retrieves a list of all registered users from the database.
      *
-     * @return a list of users
+     * @return A list of all registered {@code User} objects.
      */
     @Override
     public List<User> getUsers() {
@@ -351,7 +355,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findUserByEmail(email);
     }
 
-
+    /**
+     * Retrieves a user based on an identifier which can be a username, email, or user ID.
+     * It attempts to parse the identifier as a Long for ID, checks for '@' for email,
+     * or assumes username otherwise.
+     *
+     * @param identifier The user's username, email, or string representation of their ID.
+     * @return The {@code User} object if found.
+     * @throws UserNotFoundException if no user matches the provided identifier.
+     * @throws BlankFieldException if the identifier is null or empty.
+     */
     @Override
     public User getUser( String identifier) throws UserNotFoundException, BlankFieldException {
         validations.validationField("identifier", identifier);
@@ -421,19 +434,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 
     /**
-     * Validates a new username and email address for a user.
-     * If the current username is not blank, this method checks that the new username and email address
-     * are not already in use by another user, and throws an exception if they are.
-     * If the current username is blank, this method checks that the new username and email address are not
-     * already in use by any user, and throws an exception if they are.
+     * Validates a new username and email to ensure they are not already in use by another user.
+     * If {@code currentUsername} is provided, it allows the new username/email if it belongs to the current user.
      *
-     * @param currentUsername the current username of the user (maybe blank)
-     * @param newUsername     the new username to validate
-     * @param newEmail        the new email address to validate
-     * @return the current user, if the current username is not blank
-     * @throws UserNotFoundException  if the current username is not blank and no such user exists
-     * @throws UsernameExistException if the new username is already in use
-     * @throws EmailExistException    if the new email address is already in use
+     * @param currentUsername The current username of the user being updated (may be blank if it's a new user registration).
+     * @param newUsername     The new username to validate.
+     * @param newEmail        The new email address to validate.
+     * @return The {@code User} object corresponding to {@code currentUsername} if provided and found, otherwise {@code null}.
+     * @throws UserNotFoundException  if {@code currentUsername} is provided but no such user exists.
+     * @throws UsernameExistException if {@code newUsername} is already taken by another user.
+     * @throws EmailExistException    if {@code newEmail} is already taken by another user.
      */
     private User validateNewUserNameAndEmail(String currentUsername, String newUsername, String newEmail)
             throws UserNotFoundException, UsernameExistException, EmailExistException {
@@ -538,6 +548,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return Role.valueOf(role.toUpperCase());
     }
 
+    /**
+     * Validates that essential user fields are not blank. This is a helper method used before adding or updating a user.
+     *
+     * @param firstName The user's first name.
+     * @param lastName The user's last name.
+     * @param username The user's username.
+     * @param email The user's email.
+     * @param role The user's role.
+     * @param isNotLocked The user's lock status.
+     * @param isActive The user's active status.
+     * @throws BlankFieldException if any of the validated fields are blank.
+     */
     private void validateUserFields(String firstName, String lastName, String username, String email, String role, boolean isNotLocked, boolean isActive) throws BlankFieldException {
         validations.validateFields(List.of(
                 new Field("First Name", firstName),

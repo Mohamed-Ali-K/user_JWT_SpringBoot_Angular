@@ -50,6 +50,15 @@ public interface UserService {
      */
     User findUserByUsername(String username);
 
+    /**
+     * Retrieves a user by their username or other unique identifier.
+     * The exact nature of the identifier (username, email, ID) might be determined by the implementation.
+     *
+     * @param username The identifier (e.g., username, email, user ID as string) of the user to retrieve.
+     * @return The found {@code User} object.
+     * @throws UserNotFoundException if no user is found for the given identifier.
+     * @throws BlankFieldException if the provided identifier is blank or empty.
+     */
     User getUser(String username) throws UserNotFoundException, BlankFieldException;
 
     /**

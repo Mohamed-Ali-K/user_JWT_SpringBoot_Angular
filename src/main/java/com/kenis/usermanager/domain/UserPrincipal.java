@@ -50,26 +50,50 @@ public class UserPrincipal implements UserDetails {
         return user.getPassword();
     }
 
+    /**
+     * Returns the username of the authenticated user.
+     * @return The username.
+     */
     @Override
     public String getUsername() {
         return user.getUsername();
     }
 
+    /**
+     * Indicates whether the user's account has expired. An expired account cannot be authenticated.
+     * @return {@code true} if the user's account is valid (i.e., non-expired), {@code false} otherwise.
+     * Always returns {@code true} in this implementation.
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true; //TODO add this to user model
     }
 
+    /**
+     * Indicates whether the user is locked or unlocked. A locked account cannot be authenticated.
+     * @return {@code true} if the user is not locked, {@code false} otherwise.
+     * Delegates to {@code user.getIsNotLocked()}.
+     */
     @Override
     public boolean isAccountNonLocked() {
         return user.getIsNotLocked();
     }
 
+    /**
+     * Indicates whether the user's credentials (password) has expired. Expired credentials prevent authentication.
+     * @return {@code true} if the user's credentials are valid (i.e., non-expired), {@code false} otherwise.
+     * Always returns {@code true} in this implementation.
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true; // TODO also add this to user model
     }
 
+    /**
+     * Indicates whether the user is enabled or disabled. A disabled user cannot be authenticated.
+     * @return {@code true} if the user is enabled, {@code false} otherwise.
+     * Delegates to {@code user.getIsActive()}.
+     */
     @Override
     public boolean isEnabled() {
         return user.getIsActive();
